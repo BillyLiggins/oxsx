@@ -21,3 +21,4 @@ config/userconfig.ini
 *.log
 bin/*.sh
 gsl/
+tags
