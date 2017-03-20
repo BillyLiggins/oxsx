@@ -1,6 +1,6 @@
 #include <catch.hpp>
 #include <HistTools.h>
-#include <PdfAxis.h>
+#include <BinAxis.h>
 #include <Histogram.h>
 #include <Combinations.hpp>
 #include <Formatter.hpp>
@@ -10,7 +10,7 @@ TEST_CASE("Producing  histograms from a set of axes"){
     AxisCollection axes;
     std::stringstream ss;
     for(int i = 0; i < 4; i++)
-        axes.AddAxis(PdfAxis(Formatter() << i, 0, 1, 1));
+        axes.AddAxis(BinAxis(Formatter() << i, 0, 1, 1));
     
     std::vector<size_t> dimensionList = SequentialElements<size_t>(size_t(0), axes.GetNDimensions());
 

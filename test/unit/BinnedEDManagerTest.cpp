@@ -25,9 +25,9 @@ TEST_CASE("Three pdfs no systematics"){
     double prob3 = pdf3.GetBinContent(0);
 
     BinnedEDManager edMan;
-    edMan.AddPdf(pdf1);
-    edMan.AddPdf(pdf2);
-    edMan.AddPdf(pdf3);
+    edMan.AddBinED(pdf1);
+    edMan.AddBinED(pdf2);
+    edMan.AddBinED(pdf3);
     edMan.SetNormalisations(std::vector<double>(3, 1));
 
     SECTION("Bin Probability Method"){

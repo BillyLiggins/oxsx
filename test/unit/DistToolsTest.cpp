@@ -14,31 +14,31 @@ TEST_CASE("Writing a 1D pdf to a root histogram", "[DistTools]"){
     AxisCollection axes;
     axes.AddAxis(axis);
 
-    BinnedED binnedPdf(axes);
+    BinnedED binnedBinED(axes);
 
     SECTION("Step Function pdf"){
         // fill a heaviside
         for(size_t i = 0; i < 200; i++){
-            if(binnedPdf.GetAxes().GetBinLowEdge(i, 0) >= 0)
-                binnedPdf.SetBinContent(i,1);
+            if(binnedBinED.GetAxes().GetBinLowEdge(i, 0) >= 0)
+                binnedBinED.SetBinContent(i,1);
         }
 
-        TH1D rootPdf = DistTools::ToTH1D(binnedPdf);
-        REQUIRE(rootPdf.Integral() == 100);
+        TH1D rootBinED = DistTools::ToTH1D(binnedBinED);
+        REQUIRE(rootBinED.Integral() == 100);
         
         // root histograms are ordered 1->nbins with 0 and nbins +1 as over/underflow
         // nativex pdfs are ordered 0->nbins-1 with 0 and nbins-1 as underflow
 
         std::vector<double> firstOneHundred;
         for(size_t i = 1; i < 101; i++)
-            firstOneHundred.push_back(rootPdf.GetBinContent(i));
+            firstOneHundred.push_back(rootBinED.GetBinContent(i));
 
         std::vector<double> secondOneHundred;
         for(size_t i = 101; i < 201; i++)
-            secondOneHundred.push_back(rootPdf.GetBinContent(i));
+            secondOneHundred.push_back(rootBinED.GetBinContent(i));
 
-        double underflow = rootPdf.GetBinContent(0);
-        double overflow  = rootPdf.GetBinContent(201);
+        double underflow = rootBinED.GetBinContent(0);
+        double overflow  = rootBinED.GetBinContent(201);
 
 
         REQUIRE(firstOneHundred == std::vector<double>(100, 0));

@@ -9,18 +9,18 @@ TEST_CASE("Recover a 1D gaussian"){
     AxisCollection axes;
     axes.AddAxis(BinAxis("test", -100, 100, 200));
     
-    BinnedED inPdf(DistTools::ToHist(gaus, axes));
+    BinnedED inBinED(DistTools::ToHist(gaus, axes));
     
     BinnedEDGenerator edGen;
     edGen.SetRates(std::vector<double> (1, 1000000));
-    edGen.SetPdfs(std::vector<BinnedED> (1, inPdf));
+    edGen.SetBinEDs(std::vector<BinnedED> (1, inBinED));
 
-    BinnedED outPdf = edGen.ExpectedRatesPdf();
-    REQUIRE(outPdf.Integral() == 1000000);
-    outPdf.Normalise();
+    BinnedED outBinED = edGen.ExpectedRatesBinED();
+    REQUIRE(outBinED.Integral() == 1000000);
+    outBinED.Normalise();
 
-    double outMean = outPdf.Means().at(0);
-    double inMean = inPdf.Means().at(0);
+    double outMean = outBinED.Means().at(0);
+    double inMean = inBinED.Means().at(0);
 
     REQUIRE(std::abs(outMean) < 0.01);
 }

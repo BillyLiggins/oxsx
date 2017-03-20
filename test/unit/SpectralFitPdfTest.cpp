@@ -1,31 +1,31 @@
 #include <catch.hpp>
-#include <SpectralFitPdf.h>
+#include <SpectralFitBinED.h>
 
 TEST_CASE(""){    
     AxisCollection axes;
-    axes.AddAxis(PdfAxis("test1", 0, 10, 10));
-    axes.AddAxis(PdfAxis("test2", 0, 10, 10));
+    axes.AddAxis(BinAxis("test1", 0, 10, 10));
+    axes.AddAxis(BinAxis("test2", 0, 10, 10));
 
-    SpectralFitPdf fitPdf(axes);
+    SpectralFitBinED fitBinED(axes);
     
     SECTION("Behaves like a binned pdf"){
-        REQUIRE(fitPdf.GetNDims() == 2);
-        REQUIRE(fitPdf.GetNBins() == 100);
-        REQUIRE(fitPdf.GetBinContents() == std::vector<double>(100, 0));
+        REQUIRE(fitBinED.GetNDims() == 2);
+        REQUIRE(fitBinED.GetNBins() == 100);
+        REQUIRE(fitBinED.GetBinContents() == std::vector<double>(100, 0));
     }
     SECTION("Bin contents are adjustable"){
-        fitPdf.MakeFittable();
-        REQUIRE(fitPdf.GetParameterCount() == 100);
-        REQUIRE(fitPdf.GetParameters() == std::vector<double>(100, 0));
+        fitBinED.MakeFittable();
+        REQUIRE(fitBinED.GetParameterCount() == 100);
+        REQUIRE(fitBinED.GetParameters() == std::vector<double>(100, 0));
 
         std::vector<double> testConts;
         testConts.reserve(100);
         for(int i = 0; i < 100; i++){
             testConts.push_back(i);                        
         }
-        fitPdf.SetParameters(testConts);
-        REQUIRE(fitPdf.GetParameters() == testConts);
-        REQUIRE(fitPdf.GetBinContents() == testConts);        
+        fitBinED.SetParameters(testConts);
+        REQUIRE(fitBinED.GetParameters() == testConts);
+        REQUIRE(fitBinED.GetBinContents() == testConts);        
     }
     
 }

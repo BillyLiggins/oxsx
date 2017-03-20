@@ -1,13 +1,13 @@
 #include <catch.hpp>
-#include <PdfMapping.h>
-#include <BinnedPdf.h>
+#include <BinEDMapping.h>
+#include <BinnedED.h>
 
 TEST_CASE("Check Initialisation of 3x3 -> 3x3"){
     AxisCollection ax;
-    ax.AddAxis(PdfAxis("axis 1", 2.3, 4.5, 90));
-    ax.AddAxis(PdfAxis("axis 2", 1.3, 4.7, 11));
+    ax.AddAxis(BinAxis("axis 1", 2.3, 4.5, 90));
+    ax.AddAxis(BinAxis("axis 2", 1.3, 4.7, 11));
     
-    PdfMapping map;
+    BinEDMapping map;
     REQUIRE(map.GetNBins() == 0);
     map.SetAxes(ax);
     
@@ -25,20 +25,20 @@ TEST_CASE("Check Initialisation of 3x3 -> 3x3"){
 
 TEST_CASE("Identity Matrix Multiplication on 100 long vector"){
     AxisCollection axes;
-    axes.AddAxis(PdfAxis("", 0, 100, 100));
+    axes.AddAxis(BinAxis("", 0, 100, 100));
 
-    BinnedPdf binnedPdf(axes);
+    BinnedED binnedBinED(axes);
     for(size_t i = 0; i < 100; i++)
-        binnedPdf.SetBinContent(i, 1.1);
+        binnedBinED.SetBinContent(i, 1.1);
     
-    PdfMapping map;
+    BinEDMapping map;
     map.SetAxes(axes);
 
     for(size_t i = 0; i < 100; i++)
         map.SetComponent(i, i, 1);
 
-    BinnedPdf mappedPdf = map(binnedPdf);
+    BinnedED mappedBinED = map(binnedBinED);
 
-    REQUIRE(mappedPdf.GetBinContents() == std::vector<double> (100, 1.1));
+    REQUIRE(mappedBinED.GetBinContents() == std::vector<double> (100, 1.1));
 }
 

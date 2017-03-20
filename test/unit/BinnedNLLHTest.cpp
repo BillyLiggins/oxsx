@@ -28,9 +28,9 @@ TEST_CASE("Binned NLLH, 3 rates no systematics"){
     pdf3.SetObservables(0);
     
     BinnedNLLH lh;
-    lh.AddPdf(pdf1);
-    lh.AddPdf(pdf2);
-    lh.AddPdf(pdf3);
+    lh.AddBinED(pdf1);
+    lh.AddBinED(pdf2);
+    lh.AddBinED(pdf3);
 
     OXSXDataSet data;
     data.AddEntry(Event(std::vector<double>(1, 0)));
@@ -47,7 +47,7 @@ TEST_CASE("Binned NLLH, 3 rates no systematics"){
     }
 
     SECTION("Correct Probability with constraint"){
-        lh.SetConstraint("Pdf Normalisation 0", 3, 1);
+        lh.SetConstraint("BinED Normalisation 0", 3, 1);
 
         double sumLogProb = -log(prob1 + prob2 + prob3);
         double sumNorm    = 3;

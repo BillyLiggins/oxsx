@@ -1,9 +1,9 @@
 #include <catch.hpp>
-#include <DataRepresentation.h>
+#include <ObsSet.h>
 #include <OXSXDataSet.h>
 
 TEST_CASE("Build from one index"){
-    DataRepresentation drep(19);
+    ObsSet drep(19);
     REQUIRE(drep.GetNObservables() == 1);
     REQUIRE(drep.GetIndex(0) == 19);
 }
@@ -14,14 +14,14 @@ TEST_CASE("Build from vec"){
     indices.push_back(9);
     indices.push_back(11);
 
-    DataRepresentation drep(indices);
+    ObsSet drep(indices);
     REQUIRE(drep.GetNObservables() == 3);
     REQUIRE(drep.GetIndex(0) == 5);
     REQUIRE(drep.GetIndex(1) == 9);
     REQUIRE(drep.GetIndex(2) == 11);
 
     SECTION("Then copy construct"){
-        DataRepresentation drep2(drep);
+        ObsSet drep2(drep);
         REQUIRE(drep2.GetNObservables() == 3);
         REQUIRE(drep2.GetIndex(0) == 5);
         REQUIRE(drep2.GetIndex(1) == 9);
@@ -49,8 +49,8 @@ TEST_CASE("Looking for the relative indices of 2d rep in 4d rep"){
     bigRepIndices.push_back(3);
     bigRepIndices.push_back(6);
 
-    DataRepresentation bigRep(bigRepIndices);
-    DataRepresentation smallRep(smallRepIndices);
+    ObsSet bigRep(bigRepIndices);
+    ObsSet smallRep(smallRepIndices);
 
     std::vector<size_t> relativeIndices = smallRep.GetRelativeIndices(bigRep);
 
@@ -60,7 +60,7 @@ TEST_CASE("Looking for the relative indices of 2d rep in 4d rep"){
     
 }
 
-TEST_CASE("Creating a DataRepresentation from a DataSet by observable name"){
+TEST_CASE("Creating a ObsSet from a DataSet by observable name"){
     // create a dummy dataset with some observables in it
     std::vector<std::string> observables;
     observables.push_back("obs_1");
@@ -77,7 +77,7 @@ TEST_CASE("Creating a DataRepresentation from a DataSet by observable name"){
     requestedObs.push_back("obs_3");
     requestedObs.push_back("obs_2");
 
-    DataRepresentation generatedRep = dataSet.MakeDataRep(requestedObs);
+    ObsSet generatedRep = dataSet.MakeDataRep(requestedObs);
 
     //check it did it right
     REQUIRE(generatedRep.GetNObservables() == requestedObs.size());

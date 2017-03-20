@@ -1,9 +1,9 @@
 #include <catch.hpp>
-#include <PdfAxis.h>
+#include <BinAxis.h>
 #include <iostream>
 
-TEST_CASE("Bin Finding For Uniform Binning 1000 bins 0-100", "[PdfAxis]"){
-    PdfAxis uniform("uniform axis", 0 , 100, 1000);
+TEST_CASE("Bin Finding For Uniform Binning 1000 bins 0-100", "[BinAxis]"){
+    BinAxis uniform("uniform axis", 0 , 100, 1000);
     
     SECTION("Last bin behaviour"){
         REQUIRE(uniform.FindBin(100) == 999);
@@ -20,7 +20,7 @@ TEST_CASE("Bin Finding For Uniform Binning 1000 bins 0-100", "[PdfAxis]"){
 
 }
 
-TEST_CASE("Bin Finding For Custom Binning 1000 bins 0-1001", "[PdfAxis]"){
+TEST_CASE("Bin Finding For Custom Binning 1000 bins 0-1001", "[BinAxis]"){
 
     std::vector<double> lowEdges(1000);
     std::vector<double> highEdges(1000);
@@ -30,7 +30,7 @@ TEST_CASE("Bin Finding For Custom Binning 1000 bins 0-1001", "[PdfAxis]"){
         highEdges[i] = i+1;
     }
 
-    PdfAxis custom("custombins", lowEdges, highEdges);
+    BinAxis custom("custombins", lowEdges, highEdges);
     
     SECTION("Last bin behaviour"){
         REQUIRE(custom.FindBin(1000) == 999);

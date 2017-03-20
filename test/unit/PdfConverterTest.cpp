@@ -1,6 +1,6 @@
 #include <catch.hpp>
-#include <PdfConverter.h>
-#include <BinnedPdf.h>
+#include <DistTools.h>
+#include <BinnedED.h>
 #include <Gaussian.h>
 #include <TRandom3.h>
 #include <TFitResultPtr.h>
@@ -9,36 +9,36 @@
 #include <iostream>
 #include <TH1D.h>
 
-TEST_CASE("Writing a 1D pdf to a root histogram", "[PdfConverter]"){
-    PdfAxis axis("test", -100, 100, 200);
+TEST_CASE("Writing a 1D pdf to a root histogram", "[DistTools]"){
+    BinAxis axis("test", -100, 100, 200);
     AxisCollection axes;
     axes.AddAxis(axis);
 
-    BinnedPdf binnedPdf(axes);
+    BinnedED binnedBinED(axes);
 
     SECTION("Step Function pdf"){
         // fill a heaviside
         for(size_t i = 0; i < 200; i++){
-            if(binnedPdf.GetAxes().GetBinLowEdge(i, 0) >= 0)
-                binnedPdf.SetBinContent(i,1);
+            if(binnedBinED.GetAxes().GetBinLowEdge(i, 0) >= 0)
+                binnedBinED.SetBinContent(i,1);
         }
 
-        TH1D rootPdf = PdfConverter::ToTH1D(binnedPdf);
-        REQUIRE(rootPdf.Integral() == 100);
+        TH1D rootBinED = DistTools::ToTH1D(binnedBinED);
+        REQUIRE(rootBinED.Integral() == 100);
         
         // root histograms are ordered 1->nbins with 0 and nbins +1 as over/underflow
         // nativex pdfs are ordered 0->nbins-1 with 0 and nbins-1 as underflow
 
         std::vector<double> firstOneHundred;
         for(size_t i = 1; i < 101; i++)
-            firstOneHundred.push_back(rootPdf.GetBinContent(i));
+            firstOneHundred.push_back(rootBinED.GetBinContent(i));
 
         std::vector<double> secondOneHundred;
         for(size_t i = 101; i < 201; i++)
-            secondOneHundred.push_back(rootPdf.GetBinContent(i));
+            secondOneHundred.push_back(rootBinED.GetBinContent(i));
 
-        double underflow = rootPdf.GetBinContent(0);
-        double overflow  = rootPdf.GetBinContent(201);
+        double underflow = rootBinED.GetBinContent(0);
+        double overflow  = rootBinED.GetBinContent(201);
 
 
         REQUIRE(firstOneHundred == std::vector<double>(100, 0));
@@ -50,14 +50,14 @@ TEST_CASE("Writing a 1D pdf to a root histogram", "[PdfConverter]"){
 }
  
 
-TEST_CASE("Converting a 1D gaussian to a binned pdf", "[PdfConverter]"){    
-    PdfAxis axis("test", -100, 100, 2000);                                   
+TEST_CASE("Converting a 1D gaussian to a binned pdf", "[DistTools]"){    
+    BinAxis axis("test", -100, 100, 2000);                                   
     AxisCollection axes;                                                     
     axes.AddAxis(axis);                                                      
                                                                              
     Gaussian gaus(10, 21.1);                                                 
     gaus.SetCdfCutOff(1E8);                                                  
-    BinnedPdf binnedGaus = PdfConverter::ToBinnedPdf(gaus, axes);            
+    BinnedED binnedGaus = DistTools::ToHist(gaus, axes);            
     double intBinError  = std::abs(binnedGaus.Integral() - 1);
     REQUIRE(intBinError == Approx(0));
     
@@ -75,9 +75,9 @@ TEST_CASE("Converting a 1D gaussian to a binned pdf", "[PdfConverter]"){
     
 }                                                                           
 
-TEST_CASE("Converting 2D gaussian to binned and marginalise", "[PdfConverter]"){
-    PdfAxis axis1("ax1", -1000, 1000, 800);
-    PdfAxis axis2("ax2", -1000, 1000, 800);
+TEST_CASE("Converting 2D gaussian to binned and marginalise", "[DistTools]"){
+    BinAxis axis1("ax1", -1000, 1000, 800);
+    BinAxis axis2("ax2", -1000, 1000, 800);
 
     AxisCollection axes;
     axes.AddAxis(axis1);
@@ -93,7 +93,7 @@ TEST_CASE("Converting 2D gaussian to binned and marginalise", "[PdfConverter]"){
 
     Gaussian gaus(means, stDevs);
     gaus.SetCdfCutOff(1E8); // max accuracy
-    BinnedPdf binnedGaus = PdfConverter::ToBinnedPdf(gaus, axes);
+    BinnedED binnedGaus = DistTools::ToBinnedED(gaus, axes);
 
     SECTION("Binning Errors"){
         double integralError = std::abs(binnedGaus.Integral() - 1);        
@@ -123,9 +123,9 @@ TEST_CASE("Converting 2D gaussian to binned and marginalise", "[PdfConverter]"){
         indicies.push_back(1);
         indicies.push_back(2);
 
-        binnedGaus.SetDataRep(indicies);
-        BinnedPdf xProj = binnedGaus.Marginalise(0);
-        BinnedPdf yProj = binnedGaus.Marginalise(1);
+        binnedGaus.SetObservables(indicies);
+        BinnedED xProj = binnedGaus.Marginalise(0);
+        BinnedED yProj = binnedGaus.Marginalise(1);
 
         
         double xMean = xProj.Means().at(0);
@@ -144,7 +144,7 @@ TEST_CASE("Converting 2D gaussian to binned and marginalise", "[PdfConverter]"){
         REQUIRE(yVarEr/30/30 < 0.004);
         
 
-        //        (PdfConverter::ToTH1D(xProj)).SaveAs("x_proj.root");
-        //        (PdfConverter::ToTH1D(yProj)).SaveAs("y_proj.root");
+        //        (DistTools::ToTH1D(xProj)).SaveAs("x_proj.root");
+        //        (DistTools::ToTH1D(yProj)).SaveAs("y_proj.root");
     }
 }
