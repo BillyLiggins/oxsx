@@ -1,6 +1,9 @@
 #include <catch.hpp>
-#include <BinnedPdfManager.h>
-#include <PdfConverter.h>
+// #include <BinnedPdfManager.h>
+#include <BinnedEDManager.h>
+#include <BinAxis.h>
+#include <DistTools.h>
+// #include <PdfConverter.h>
 #include <Gaussian.h>
 #include <iostream>
 
@@ -10,21 +13,21 @@ TEST_CASE("Three pdfs no systematics"){
     Gaussian gaus3(4, 5);
 
     AxisCollection axes;
-    axes.AddAxis(PdfAxis("axis1", -40, 40 , 200));
+    axes.AddAxis(BinAxis("axis1", -40, 40 , 200));
 
-    BinnedPdf pdf1 = PdfConverter::ToBinnedPdf(gaus1, axes);
-    BinnedPdf pdf2 = PdfConverter::ToBinnedPdf(gaus2, axes);
-    BinnedPdf pdf3 = PdfConverter::ToBinnedPdf(gaus3, axes);
+    BinnedED pdf1 = DistTools::ToHist(gaus1, axes);
+    BinnedED pdf2 = DistTools::ToHist(gaus2, axes);
+    BinnedED pdf3 = DistTools::ToHist(gaus3, axes);
 
-    pdf1.SetDataRep(0);
-    pdf2.SetDataRep(0);    
-    pdf3.SetDataRep(0);
+    pdf1.SetObservables(0);
+    pdf2.SetObservables(0);    
+    pdf3.SetObservables(0);
 
     double prob1 = pdf1.GetBinContent(0);
     double prob2 = pdf2.GetBinContent(0);    
     double prob3 = pdf3.GetBinContent(0);
 
-    BinnedPdfManager pdfMan;
+    BinnedEDManager pdfMan;
     pdfMan.AddPdf(pdf1);
     pdfMan.AddPdf(pdf2);
     pdfMan.AddPdf(pdf3);
@@ -35,7 +38,7 @@ TEST_CASE("Three pdfs no systematics"){
     }
     
     SECTION("Probability Method"){
-        REQUIRE(pdfMan.Probability(EventData(std::vector<double>(1, -39.5))) == Approx(prob1 * prob2 * prob3));
+        REQUIRE(pdfMan.Probability(Event(std::vector<double>(1, -39.5))) == Approx(prob1 * prob2 * prob3));
     }
 
 }
