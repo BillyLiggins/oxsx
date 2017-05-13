@@ -19,7 +19,8 @@ BinnedNLLH::Evaluate(){
         fAlreadyShrunk = true;
     }
 
-    // Construct systematics fSystematicManager.Construct(); 
+    // Construct systematics 
+    fSystematicManager.Construct(); 
     // Apply systematics
     fPdfManager.ApplySystematics(fSystematicManager);
 
@@ -47,9 +48,33 @@ BinnedNLLH::Evaluate(){
         nLogLH += it->second.Evaluate(fComponentManager.GetParameter(it->first));
    
     //Pirors 
-    if(fPirorsSet) 
-        // For when map is made.
-        // nLogLH += fPirorManager->GetProbabilities("listOfParameter");
+    if(fPirorsSet) {
+        std::map<std::string, double> tmp;
+
+        std::vector<std::string> names =fComponentManager.GetParameterNames();
+        std::vector<double> values =fComponentManager.GetParameters();
+        for (int i = 0; i < fComponentManager.GetTotalParameterCount(); ++i) {
+            std::cout<<"tmp["<<names.at(i)<<"]=values.at("<<i<<") = "<<values.at(i)<<std::endl;
+            tmp[names.at(i)]=values.at(i);
+        }
+        std::vector<Piror> pirors=fPirorManager.GetPirors();
+
+        std::cout <<  "pirors.size() = "<<pirors.size()<< std::endl;
+        for (int i = 0; i < pirors.size(); ++i) {
+            std::cout << "in" << std::endl;
+            std::vector<std::string> names=pirors.at(i).GetParameterList();
+                for (int j = 0; j < names.size(); ++j) {
+                    std::cout << "inin" << std::endl;
+                    std::cout <<"name"<<j<<" = "<< names.at(j)<< std::endl;
+                }
+            
+        }
+        std::cout << "before adding = "<<nLogLH << std::endl;
+        nLogLH += fPirorManager.GetLogProbabilities(tmp);
+        std::cout << "value = "<<fPirorManager.GetLogProbabilities(tmp) << std::endl;
+        std::cout << "after adding = "<<nLogLH << std::endl;
+
+    }
 
     return nLogLH;
 }
@@ -218,6 +243,16 @@ BinnedNLLH::SetParameters(const std::vector<double>& params_){
     }
 }
                                              
+void
+BinnedNLLH::PrintParameters() const{
+    std::cout << "-----Printing parameters for likelihood ------"<< std::endl;
+
+    std::vector<std::string> names =fComponentManager.GetParameterNames();
+    std::vector<double> values =fComponentManager.GetParameters();
+    for (int i = 0; i < fComponentManager.GetTotalParameterCount(); ++i) {
+       std::cout <<"name = "<<names.at(i)<<" value = "<<values.at(i)  << std::endl; 
+    }
+}
                  
 std::vector<double>
 BinnedNLLH::GetParameters() const{
