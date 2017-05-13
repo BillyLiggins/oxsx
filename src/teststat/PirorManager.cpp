@@ -28,14 +28,16 @@ PirorManager::GetPirors(){
 
 double PirorManager::GetProbabilities( const std::map<std::string, double>& params_){
     double result=0;
+    //Loop over all pirors
     for (std::vector<Piror>::iterator iter = pirorList.begin(); iter != pirorList.end(); ++iter ) {
         std::vector<double> parameterHolder;
+        //Get parameter list.
         std::vector<std::string> parameterList = (*iter).GetParameterList();
 
+        //for each parameter in the list get the double it has at that moment. 
         for (std::vector<std::string>::iterator i = parameterList.begin(); i != parameterList.end(); ++i) {
             parameterHolder.push_back(params_.at((*i))); 
         }
-        //How do i know what params to feed it?
 
         result += (*iter).Probability(parameterHolder);
     }
