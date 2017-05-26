@@ -242,6 +242,13 @@ BinnedNLLH::SetParameters(const std::vector<double>& params_){
         throw ParameterCountError(std::string("BinnedNLLH::") + e_.what());
     }
 }
+
+void 
+BinnedNLLH::PrintParameters(const std::vector<double>& params_){
+    for (int i = 0; i < params_.size(); ++i) {
+        std::cout << params_.at(i) << " ";
+    }
+}
                                              
 void
 BinnedNLLH::PrintParameters() const{

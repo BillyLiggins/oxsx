@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <map>
+//Include a matrix class
 
 typedef std::map<std::string, Histogram> HistMap;
 

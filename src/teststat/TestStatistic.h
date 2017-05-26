@@ -14,6 +14,8 @@ class TestStatistic{
     virtual ~TestStatistic() {}
 
     virtual double Evaluate() = 0;    
+    virtual void   SetVerboseMode() = 0;
+    virtual void   PrintParameters(const std::vector<double>& params_) = 0;
     virtual void   SetParameters(const std::vector<double>& params_) = 0;
     virtual std::vector<double> GetParameters() const = 0;
     virtual int    GetParameterCount() const = 0;

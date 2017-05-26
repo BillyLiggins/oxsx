@@ -16,7 +16,7 @@
 class DataSet;
 class BinnedNLLH : public TestStatistic{
  public:
-    BinnedNLLH() : fCalculatedDataDist(false), fAlreadyShrunk(false),fPirorsSet(false), fDataSet(NULL), fSignalCutEfficiency(1){}
+    BinnedNLLH() : fCalculatedDataDist(false), fAlreadyShrunk(false),fPirorsSet(false), fDataSet(NULL), fSignalCutEfficiency(1), fVerboseMode(false) {}
 
     void   SetPdfManager(const BinnedEDManager&);
     void   SetSystematicManager(const SystematicManager&);
@@ -56,8 +56,12 @@ class BinnedNLLH : public TestStatistic{
     CutLog GetSignalCutLog() const;
     void   SetSignalCutLog(const CutLog&);
 
+    void SetVerboseMode(){fVerboseMode=true;}
+
     // Test statistic interface
     void RegisterFitComponents(); 
+    //This method will print the current parameters to screen in verbose mode.  
+    void PrintParameters(const std::vector<double>&);
     void SetParameters(const std::vector<double>&);
     std::vector<double> GetParameters() const;
     int  GetParameterCount() const;
@@ -82,6 +86,7 @@ class BinnedNLLH : public TestStatistic{
     bool             fCalculatedDataDist;
     bool             fAlreadyShrunk;
     bool             fPirorsSet;
+    bool             fVerboseMode;
     ComponentManager fComponentManager;    
 };
 #endif

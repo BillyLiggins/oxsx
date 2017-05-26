@@ -1,6 +1,7 @@
 #include <ChiSquare.h>
 #include <DataSet.h>
 #include <sstream>
+#include <iostream>
 #include <Exceptions.h>
 
 double
@@ -57,6 +58,7 @@ void
 ChiSquare::SetParameters(const std::vector<double>& params_){
     try{
         fComponentManager.SetParameters(params_);
+        PrintParameters(params_);
     }
     catch(const ParameterCountError& e_){
         throw ParameterCountError(std::string("ChiSquare: ") + e_.what());

@@ -18,13 +18,17 @@
 
 class CompositeBinnedNLLH : public TestStatistic{
  public:
-  CompositeBinnedNLLH() {fInitialised = 0;}
+  CompositeBinnedNLLH() {fInitialised = 0;fVerboseMode=true;}
   virtual ~CompositeBinnedNLLH() {};
   
   //Inherited methods that must be implemented:
   //This method will call the Evaluate method for each component and sum them
   double Evaluate();
   
+  void SetVerboseMode(){fVerboseMode=true;}
+
+  //This method will print the current parameters to screen in verbose mode.  
+  void PrintParameters(const std::vector<double>&);
   //This method will set the parameters - need to distribute them between the components
   void SetParameters(const std::vector<double>&);
   //Get the parameters from each component and order them as expected in the return vector
@@ -58,5 +62,6 @@ class CompositeBinnedNLLH : public TestStatistic{
   // In the FitIndex we store the mapping to fit parameter - if there are shared parameters there are less fit parameters than internal parameters
   std::vector<int> fFitIndex;  // store the mapping of internal parameter
   bool fInitialised;    // set a flag to ensure we have initialised for book-keeping
+  bool fVerboseMode;    // set a flag to print current parameters to screen.
 };
 #endif
