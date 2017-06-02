@@ -189,6 +189,7 @@ void
 BinnedNLLH::RegisterFitComponents(){
     fComponentManager.Clear();
     fComponentManager.AddComponent(&fPdfManager);
+    //FIXM :: You'll add systematics twice if in different groups!! 
 
     //Need to get the group loop over all of them.
     const std::map<std::string, std::vector<Systematic*> > sys_ = fSystematicManager.GetSystematics();
@@ -211,17 +212,6 @@ BinnedNLLH::SetParameters(const ParameterDict& params_){
     }
 }
                                              
-void
-BinnedNLLH::PrintParameters() const{
-    std::cout << "-----Printing parameters for likelihood ------"<< std::endl;
-
-    std::vector<std::string> names =fComponentManager.GetParameterNames();
-    std::vector<double> values =fComponentManager.GetParameters();
-    for (int i = 0; i < fComponentManager.GetTotalParameterCount(); ++i) {
-       std::cout <<"name = "<<names.at(i)<<" value = "<<values.at(i)  << std::endl; 
-    }
-}
-                 
 ParameterDict
 BinnedNLLH::GetParameters() const{
     return fComponentManager.GetParameters();
