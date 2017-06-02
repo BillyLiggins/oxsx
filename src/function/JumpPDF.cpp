@@ -102,6 +102,13 @@ JumpPDF::Integral(const std::vector<double>& mins_,
 // FIT COMPONENT INTERFACE //
 /////////////////////////////
 
+std::string
+GetName() const{
+
+}
+void 
+SetName(const std::string&){
+}
 void
 JumpPDF::RenameParameter(const std::string& old_, const std::string& new_){
     if(!fPDF)
