@@ -103,11 +103,13 @@ JumpPDF::Integral(const std::vector<double>& mins_,
 /////////////////////////////
 
 std::string
-GetName() const{
-
+JumpPDF::GetName() const{
+    return fName;
 }
+
 void 
-SetName(const std::string&){
+JumpPDF::SetName(const std::string& name){
+    fName=name;
 }
 void
 JumpPDF::RenameParameter(const std::string& old_, const std::string& new_){
