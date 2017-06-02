@@ -1,6 +1,28 @@
 #include <SystematicManager.h>
 #include <Exceptions.h>
 
+const int&
+SystematicManager::GetNSystematicsInGroup(std::string & name) const{
+    return group[name].size();
+}
+
+const std::vector<Systematic*>&
+SystematicManager::GetSystematicsInGroup(std::string & name) const{
+    return group[name];
+}
+
+const std::vector<std::string>& 
+SystematicManager::GetGroupNames(std::string & name) const{
+    
+    std::vector<std::string> names;
+    for (std::map<std::string,std::vector<Systematic*> >::const_iterator GroupName =group.begin(); GroupName != group.end(); ++GroupName ) {
+        names.push_back(GroupName->first);
+
+
+    return names;
+
+}
+
 
 const std::map<std::string, std::vector<Systematic*> >& 
 SystematicManager::GetSystematicsGroup() const{

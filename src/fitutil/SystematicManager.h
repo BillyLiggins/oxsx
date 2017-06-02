@@ -19,6 +19,11 @@ class SystematicManager{
     void AddPdfToGroup(const std::string& groupName_, BinnedED& ED_);
 
     const std::map<std::string,std::vector<Systematic*> >& GetSystematicsGroup() const;
+
+    const size_t& GetNSystematicsInGroup(std::string & name) const;
+    const std::vector<Systematic*>& GetSystematicsInGroup(std::string & name) const;
+
+    const std::vector<std::string>& GetGroupNames(std::string & name) const;
     
     size_t GetNSystematics() const;
 
