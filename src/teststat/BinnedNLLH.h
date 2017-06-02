@@ -3,7 +3,6 @@
 #include <TestStatistic.h>
 #include <BinnedEDManager.h>
 #include <SystematicManager.h>
-#include <PirorManager.h>
 #include <BinnedEDShrinker.h>
 #include <ComponentManager.h>
 #include <DataSet.h>
