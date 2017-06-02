@@ -192,7 +192,7 @@ BinnedNLLH::RegisterFitComponents(){
     //FIXM :: You'll add systematics twice if in different groups!! 
 
     //Need to get the group loop over all of them.
-    const std::map<std::string, std::vector<Systematic*> > sys_ = fSystematicManager.GetSystematics();
+    const std::map<std::string, std::vector<Systematic*> > sys_ = fSystematicManager.GetSystematicsGroup();
 
     for (std::map<std::string, std::vector<Systematic*> >::const_iterator group_ = sys_.begin(); group_ !=sys_.end(); ++group_) {
         for (int i = 0; i < group_->second.size(); ++i) {

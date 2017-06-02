@@ -54,7 +54,7 @@ BinnedEDManager::ApplySystematics(SystematicManager& sysMan_){
     // If there are no systematics dont do anything
     //  ( working pdfs = original pdfs from initialisation)
 
-    if(!sysMan_.GetSystematics().size())
+    if(!sysMan_.GetSystematicsGroup().size())
         return;
 
     for(size_t j = 0; j < fOriginalPdfs.size(); j++){

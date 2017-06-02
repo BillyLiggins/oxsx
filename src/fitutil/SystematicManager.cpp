@@ -1,13 +1,9 @@
 #include <SystematicManager.h>
 #include <Exceptions.h>
 
-// const std::vector<Systematic*>&
-// SystematicManager::GetSystematics() const{
-//     return fSystematics;
-// }
 
 const std::map<std::string, std::vector<Systematic*> >& 
-SystematicManager::GetSystematics() const{
+SystematicManager::GetSystematicsGroup() const{
     return groups;
 }
 
