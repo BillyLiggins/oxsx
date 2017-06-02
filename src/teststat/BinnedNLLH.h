@@ -3,6 +3,7 @@
 #include <TestStatistic.h>
 #include <BinnedEDManager.h>
 #include <SystematicManager.h>
+#include <PirorManager.h>
 #include <BinnedEDShrinker.h>
 #include <ComponentManager.h>
 #include <DataSet.h>
@@ -21,7 +22,8 @@ class BinnedNLLH : public TestStatistic{
     void   SetSystematicManager(const SystematicManager&);
 
     void   AddPdf(const BinnedED&);
-    void   AddSystematic(Systematic*);
+    // void   AddSystematic(Systematic*);
+    void   AddSystematic(Systematic* sys_, std::string group_ = std::string("all") );
 
     void   AddPdfs(const std::vector<BinnedED>&);
     void   AddSystematics(const std::vector<Systematic*>);
@@ -60,6 +62,8 @@ class BinnedNLLH : public TestStatistic{
     int  GetParameterCount() const;
     double Evaluate();
     std::vector<std::string> GetParameterNames() const;
+
+    void PrintParameters() const;
 
  private:
     BinnedEDManager      fPdfManager;
