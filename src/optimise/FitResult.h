@@ -6,6 +6,7 @@
 #include <Histogram.h>
 #include <cstdlib>
 #include <vector>
+#include <ParameterDict.h>
 #include <string>
 #include <map>
 
@@ -18,12 +19,9 @@ class FitResult{
     FitResult operator=(const FitResult&); //deep copy
     ~FitResult(); // frees stat space
 
-    void  SetBestFit(const std::vector<double>&);
-    std::vector<double> GetBestFit() const;
-
-    std::vector<std::string> GetParameterNames() const;
-    void SetParameterNames(const std::vector<std::string>&);
-
+    const ParameterDict& GetBestFit() const;
+    void SetBestFit(const ParameterDict&);
+    
     void SetStatSpace(const Histogram&);
     const Histogram& GetStatSpace() const; 
 
@@ -48,8 +46,7 @@ class FitResult{
 
 
  private:
-    std::vector<double>               fBestFit;
-    std::vector<std::string>          fParameterNames;
+    ParameterDict fBestFit;
     std::vector<std::vector<double> > fStatSample;
     Histogram*    fStatSpace;
     HistMap f1DProjections;

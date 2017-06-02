@@ -22,23 +22,23 @@ class Minuit : public Optimiser{
 
     virtual const FitResult& Optimise(TestStatistic*);
 
-    void Fix(size_t index_);
-    void Release(size_t index_);
+    void Fix(const std::string& param_);
+    void Release(const std::string& param_);
 
     void SetMethod(const std::string&);
     std::string GetMethod() const;
 
-    void SetInitialValues(const std::vector<double>&);
-    void SetInitialErrors(const std::vector<double>&);
+    void SetInitialValues(const ParameterDict&);
+    void SetInitialErrors(const ParameterDict&);
 
     void   SetUpperContourEdge(double);
     double GetUpperContourEdge() const;
 
-    void SetMinima(const std::vector<double>& minima_);
-    std::vector<double> GetMinima() const;
+    void SetMinima(const ParameterDict& minima_);
+    ParameterDict GetMinima() const;
 
-    void SetMaxima(const std::vector<double>& maxima_);
-    std::vector<double> GetMaxima() const;
+    void SetMaxima(const ParameterDict& maxima_);
+    ParameterDict GetMaxima() const;
    
     void     SetMaxCalls(unsigned);
     unsigned GetMaxCalls() const;
@@ -54,18 +54,21 @@ class Minuit : public Optimiser{
  private:
     void Initialise();
     MinuitFCN   fMinuitFCN; // wrapper on evaluator so migrad can call it
-    std::vector<double> fInitialValues;
-    std::vector<double> fInitialErrors;
+    ParameterDict fInitialValues;
+    ParameterDict fInitialErrors;
 
-    std::vector<double> fMinima;
-    std::vector<double> fMaxima;
-    std::set<size_t>    fFixedParameters;
+    ParameterDict fMinima;
+    ParameterDict fMaxima;
+    std::set<std::string>    fFixedParameters;
 
     unsigned fMaxCalls;
     double   fTolerance;
 
     std::string fMethod;
     ROOT::Minuit2::MnApplication* fMinimiser;
+
+    std::vector<std::string> fParameterNames; 
+    // the order they are held in vectors for ROOT
 
     FitResult fFitResult;
     bool fMaximising;

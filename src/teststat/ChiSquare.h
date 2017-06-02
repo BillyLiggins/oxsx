@@ -22,8 +22,8 @@ class ChiSquare : public TestStatistic{
     double Evaluate();
     void   RegisterFitComponents();
     int    GetParameterCount() const;
-    void   SetParameters(const std::vector<double>& params_);
-    std::vector<double> GetParameters() const;
+    void   SetParameters(const ParameterDict& params_);
+    ParameterDict GetParameters() const;
     std::vector<std::string> GetParameterNames() const;
     
  private:

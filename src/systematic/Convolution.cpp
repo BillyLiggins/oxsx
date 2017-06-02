@@ -6,8 +6,8 @@
 #include <string>
 void 
 Convolution::SetFunction(PDF* function_){
-    // wrap this up if position independent kernal of the form P(x | x2) = P(x - x2)
-    fDist = static_cast<ConditionalPDF*>(new JumpPDF(function_));
+    // wrap this up if position independent kernel of the form P(x | x2) = P(x - x2)
+    fDist = static_cast<ConditionalPDF*>(new JumpPDF("kernel", function_));
 }
 
 void
@@ -114,21 +114,34 @@ Convolution::CacheCompatibleBins(){
 // Make this object fittable //
 ///////////////////////////////
 
+// Fitting this dist to data means adjusting the underlying function
+
 void
-Convolution::MakeFittable(){
-    fDist->MakeFittable();
+Convolution::RenameParameter(const std::string& old_, const std::string& new_){
+    fDist->RenameParameter(old_, new_);
 }
 
-std::vector<std::string>
-Convolution::GetParameterNames() const{
-    std::vector<std::string> param = fDist->GetParameterNames();
-    for(size_t i = 0; i < param.size(); i++){
-        param[i] = "Convolution : " + param[i];        
+void
+Convolution::SetParameter(const std::string& name_, double value_){
+    fDist->SetParameter(name_, value_);
+}
+
+double
+Convolution::GetParameter(const std::string& name_) const{
+    return fDist->GetParameter(name_);
+}
+
+void
+Convolution::SetParameters(const ParameterDict& ps_){
+    try{
+        fDist->SetParameters(ps_);
     }
-    return param;
+    catch(const ParameterError& e_){
+        throw ParameterError("Convolution internal function: " + std::string(e_.what()));
+    }
 }
 
-std::vector<double>
+ParameterDict
 Convolution::GetParameters() const{
     return fDist->GetParameters();
 }
@@ -138,13 +151,16 @@ Convolution::GetParameterCount() const{
     return fDist->GetParameterCount();
 }
 
+std::vector<std::string>
+Convolution::GetParameterNames() const{
+    return fDist->GetParameterNames();
+}
+
+std::string
+Convolution::GetName() const{
+    return fName;
+}
 void
-Convolution::SetParameters(const std::vector<double>& params_){
-    try{
-        fDist->SetParameters(params_);
-    }
-    catch(const ParameterCountError& e){
-        throw ParameterCountError(std::string("Convolution : ") 
-                                  + e.what());
-    }
+Convolution::SetName(const std::string& n_){
+    fName = n_;
 }

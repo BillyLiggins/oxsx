@@ -13,11 +13,11 @@ FitResult::~FitResult(){
 }
 
 void
-FitResult::SetBestFit(const std::vector<double>& bestFit_){
+FitResult::SetBestFit(const ParameterDict& bestFit_){
     fBestFit = bestFit_;
 }
 
-std::vector<double>
+const ParameterDict&
 FitResult::GetBestFit() const{
     return fBestFit;
 }
@@ -42,7 +42,6 @@ FitResult::operator=(const FitResult& other_){
     fIsValid = other_.fIsValid;
     fBestFit = other_.fBestFit;
     fStatSample = other_.fStatSample;
-    fParameterNames = other_.fParameterNames;
     f1DProjections = other_.f1DProjections;
     f2DProjections = other_.f2DProjections;
     return *this;
@@ -54,7 +53,6 @@ FitResult::FitResult(const FitResult& other_){
 
     else
         fStatSpace = new Histogram(*other_.fStatSpace);
-    fParameterNames = other_.fParameterNames;
     fStatSample = other_.fStatSample;
     fBestFit = other_.fBestFit;
     fIsValid = other_.fIsValid;
@@ -83,16 +81,6 @@ FitResult::SetValid(bool b_){
 }
 
 void
-FitResult::SetParameterNames(const std::vector<std::string>& names_){
-    fParameterNames = names_;
-}
-
-std::vector<std::string>
-FitResult::GetParameterNames() const{
-    return fParameterNames;
-}
-
-void
 FitResult::Print() const{
   std::cout << AsString() << std::endl;
 }
@@ -107,11 +95,6 @@ FitResult::SaveAs(const std::string& fileName_) const{
 
 std::string
 FitResult::AsString() const{
-  if(fParameterNames.size() != fBestFit.size())
-      throw NotFoundError(Formatter() << "FitResult::Expected one name for each parameter - got " 
-                            << fParameterNames.size() << " names and " << fBestFit.size() << " params"
-                            );
-
   time_t t = time(0);
   struct tm * now = localtime(&t);
   
@@ -134,12 +117,12 @@ FitResult::AsString() const{
      << std::endl;
        
   ss << "Best Fit Values: " << std::endl << std::endl;
-  for(size_t i = 0; i < fParameterNames.size(); i++){
+  for(ParameterDict::const_iterator it = fBestFit.begin(); it != fBestFit.end(); ++it){
     ss << std::setw(25) 
-       << fParameterNames.at(i) << "\t\t" 
+       << it->first << "\t\t" 
        << std::setw(10) 
        << std::setprecision(printPrecision)
-       << fBestFit.at(i)
+       << it->second
        << std::endl;
   }
   return ss.str();

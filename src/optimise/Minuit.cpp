@@ -8,6 +8,12 @@
 #include <Exceptions.h>
 #include <Formatter.hpp>
 
+using ContainerTools::GetValues;
+using ContainerTools::HasSameKeys;
+using ContainerTools::GetKeys;
+using ContainerTools::ToString;
+
+
 using ROOT::Minuit2::MnMigrad;
 using ROOT::Minuit2::MnMinimize;
 using ROOT::Minuit2::MnSimplex;
@@ -30,12 +36,12 @@ Minuit::GetMethod() const{
 }
 
 void
-Minuit::SetInitialErrors(const std::vector<double>& errs_){
+Minuit::SetInitialErrors(const ParameterDict& errs_){
     fInitialErrors = errs_;
 }
 
 void
-Minuit::SetInitialValues(const std::vector<double>& vals_){
+Minuit::SetInitialValues(const ParameterDict& vals_){
     fInitialValues = vals_;
 }
 
@@ -50,15 +56,15 @@ Minuit::GetUpperContourEdge() const{
 }
 
 void
-Minuit::SetMaxima(const std::vector<double>& maxima_) {fMaxima = maxima_;}
+Minuit::SetMaxima(const ParameterDict& maxima_) {fMaxima = maxima_;}
 
-std::vector<double> 
+ParameterDict 
 Minuit::GetMaxima() const {return fMaxima;}
 
 void
-Minuit::SetMinima(const std::vector<double>& minima_) {fMinima = minima_;}
+Minuit::SetMinima(const ParameterDict& minima_) {fMinima = minima_;}
 
-std::vector<double> 
+ParameterDict 
 Minuit::GetMinima() const {return fMinima;}
 
 void 
@@ -68,17 +74,38 @@ Minuit::Initialise(){
 
     // max or min?
     if(fMaximising)
-        fMinuitFCN.SetSignFlip(true);   
+        fMinuitFCN.SetSignFlip(true);
 
+    // check everything makes sense
+    if( !HasSameKeys(fMinima, fMaxima))
+        throw LogicError(Formatter()
+                         << "Minuit initialisation error "
+                         << " minima/maxima parameters dont't match:\n"
+                         << "Minima for :\n" << ToString(GetKeys(fMinima)) << "\n"
+                         << "Maxima for :\n" << ToString(GetKeys(fMaxima)) << "\n"
+                         );
+
+    if( !HasSameKeys(fInitialErrors, fInitialValues))
+        throw LogicError(Formatter()
+                         << "Minuit initialisation error "
+                         << "Initial value/error parameters dont't match:\n"
+                         << "Initial Values for :\n" << ToString(GetKeys(fInitialValues)) << "\n"
+                         << "Initial Errors for :\n" << ToString(GetKeys(fInitialErrors)) << "\n"
+                         );
+    
+    // impose a set ordering on the parameters, so they can be reliably referenced (minuit does vectors we do maps)
+    fParameterNames = GetKeys(fInitialErrors);
+    
     // Create parameters and set limits
-    MnUserParameters params(fInitialValues, fInitialErrors);
+    MnUserParameters params(GetValues(fInitialValues, fParameterNames), GetValues(fInitialErrors, fParameterNames));
+
     if(fMinima.size() && fMaxima.size())
-        for(size_t i = 0; i < fInitialValues.size(); i++)
-            params.SetLimits(i, fMinima.at(i), fMaxima.at(i));
-        
+        for(size_t i = 0; i < fParameterNames.size(); i++)
+            params.SetLimits(i, fMinima[fParameterNames.at(i)], fMaxima[fParameterNames.at(i)]);
+    
     if("Migrad" == fMethod)
         fMinimiser = new MnMigrad(fMinuitFCN, params);
-
+    
     else if ("Minimize" == fMethod)
         fMinimiser = new MnMinimize(fMinuitFCN, params);
     
@@ -91,57 +118,51 @@ Minuit::Initialise(){
 }
 
 void
-Minuit::Fix(size_t index_){
-    fFixedParameters.insert(index_);
+Minuit::Fix(const std::string& name_){
+    fFixedParameters.insert(name_);
 }
 
 void
-Minuit::Release(size_t index_){
-  fFixedParameters.erase(index_);
+Minuit::Release(const std::string& name_){
+    fFixedParameters.erase(name_);
 }
 
 void
 Minuit::SetMaxCalls(unsigned max_) {
-  fMaxCalls = max_;
+    fMaxCalls = max_;
 }
 
 unsigned
 Minuit::GetMaxCalls() const {
-  return fMaxCalls;
+    return fMaxCalls;
 }
 
 const FitResult&
 Minuit::Optimise(TestStatistic* testStat_){
     testStat_ -> RegisterFitComponents();
     
-    size_t nParams = testStat_ -> GetParameterCount();
-    if(   fInitialValues.size() != nParams
-       || fInitialErrors.size() != nParams
-       || fMinima.size() != nParams
-       || fMaxima.size() != nParams
-       )
-        throw LogicError(Formatter() 
-                         << "Minuit initialisation error - Got "
-                         << fMinima.size() << " Minima, "
-                         << fMaxima.size() << " Maxima, "
-                         << fInitialValues.size() << " Initial Values and "
-                         << fInitialErrors.size() << " Initial Errors"
-                         << " - Need one per fit parameter (" << nParams
-                         << ")"
-                         );
-                         
-    fMinuitFCN = MinuitFCN(testStat_);
+    fMinuitFCN = MinuitFCN(testStat_, fParameterNames);
     Initialise();
-    
-    std::set<size_t>::iterator it = fFixedParameters.begin();
-    for(; it != fFixedParameters.end(); ++it)
-      fMinimiser -> Fix(*it);
 
+    if(testStat_->GetParameterNames() != fParameterNames)
+        throw LogicError(Formatter() << "Minuit config parameters don't match the test statistic!\n" 
+                         << "TestStatistic:\n" << ToString(testStat_->GetParameterNames()) 
+                         << "Minuit:\n" << ToString(fParameterNames)
+                         );
+    
+
+    // fix the requested parameters
+    // first work out which minuit index this refers to
+    std::set<std::string>::iterator it = fFixedParameters.begin();
+    for(; it != fFixedParameters.end(); ++it){
+        size_t pos = std::distance(std::find(fParameterNames.begin(), fParameterNames.end(), *it), fParameterNames.begin());
+        fMinimiser -> Fix(pos);
+    }
+    
     // defaults are same as ROOT defaults
     ROOT::Minuit2::FunctionMinimum fnMin  = fMinimiser -> operator()(fMaxCalls, fTolerance); 
 
-    fFitResult.SetBestFit(fMinimiser -> Params());
-    fFitResult.SetParameterNames(testStat_->GetParameterNames());
+    fFitResult.SetBestFit(ContainerTools::VecsToMap(fParameterNames, fMinimiser -> Params()));
     fFitResult.SetValid(fnMin.IsValid());
     return fFitResult;
 }
