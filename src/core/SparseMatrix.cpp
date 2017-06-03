@@ -68,6 +68,15 @@ SparseMatrix::SetZeros(){
     fArmaMat = arma::sp_mat(fNCols, fNRows);
 }
 
+void
+SparseMatrix::SetIdentity(){
+    if(!fNRows && !fNCols && fNCol!=fNRows)
+        return;
+    fArmaMat = arma::sp_mat(fNCols, fNRows);
+    for (size_t i = 0; i < fNCols; ++i)
+        fArmaMat(i,i)=1;
+}
+
 // FIXME: unsigned vs. size_t
 void 
 SparseMatrix::SetComponents(const std::vector<unsigned>& rowIndices_,
