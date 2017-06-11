@@ -123,7 +123,7 @@ AnalyticED::GetParameterCount() const{
     return fFunction->GetParameterCount();
 }
 
-std::vector<std::string>
+std::set<std::string>
 AnalyticED::GetParameterNames() const{
     return fFunction->GetParameterNames();
 }

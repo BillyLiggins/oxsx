@@ -41,6 +41,7 @@ FitResult::operator=(const FitResult& other_){
         fStatSpace = new Histogram(*other_.fStatSpace);
     fIsValid = other_.fIsValid;
     fBestFit = other_.fBestFit;
+    fExtremeVal = other_.fExtremeVal;
     fStatSample = other_.fStatSample;
     f1DProjections = other_.f1DProjections;
     f2DProjections = other_.f2DProjections;
@@ -56,6 +57,7 @@ FitResult::FitResult(const FitResult& other_){
     fStatSample = other_.fStatSample;
     fBestFit = other_.fBestFit;
     fIsValid = other_.fIsValid;
+    fExtremeVal = other_.fExtremeVal;
     f1DProjections = other_.f1DProjections;
     f2DProjections = other_.f2DProjections;
 }
@@ -157,3 +159,12 @@ FitResult::Get2DProjections() const{
   return f2DProjections;
 }
 
+double
+FitResult::GetExtremeVal() const{
+    return fExtremeVal;
+}
+
+void
+FitResult::SetExtremeVal(double val_){
+    fExtremeVal = val_;
+}

@@ -10,7 +10,7 @@
 #include <MinuitFCN.h>
 #include <Minuit2/MnApplication.h>
 #include <FitResult.h>
-#include <set>
+
 class TestStatistic;
 
 class Minuit : public Optimiser{
@@ -52,7 +52,7 @@ class Minuit : public Optimiser{
     FitResult GetFitResult() const;
 
  private:
-    void Initialise();
+    void Initialise(TestStatistic*);
     MinuitFCN   fMinuitFCN; // wrapper on evaluator so migrad can call it
     ParameterDict fInitialValues;
     ParameterDict fInitialErrors;
@@ -67,7 +67,7 @@ class Minuit : public Optimiser{
     std::string fMethod;
     ROOT::Minuit2::MnApplication* fMinimiser;
 
-    std::vector<std::string> fParameterNames; 
+    std::set<std::string> fParameterNames; 
     // the order they are held in vectors for ROOT
 
     FitResult fFitResult;

@@ -151,7 +151,7 @@ Convolution::GetParameterCount() const{
     return fDist->GetParameterCount();
 }
 
-std::vector<std::string>
+std::set<std::string>
 Convolution::GetParameterNames() const{
     return fDist->GetParameterNames();
 }

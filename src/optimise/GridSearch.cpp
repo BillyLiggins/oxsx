@@ -116,6 +116,7 @@ GridSearch::Optimise(TestStatistic* testStat_){
        
     }
     fFitResult.SetBestFit(setParams);
+    fFitResult.SetExtremeVal(fMinVal);
     return fFitResult;
 }
 

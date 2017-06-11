@@ -164,7 +164,7 @@ JumpPDF::GetParameterCount() const{
     return fPDF->GetParameterCount();
 }
 
-std::vector<std::string>
+std::set<std::string>
 JumpPDF::GetParameterNames() const{
     if(!fPDF)
          throw NULLPointerAccessError("JumpPDF::Probability",

@@ -68,13 +68,9 @@ ParameterDict
 Minuit::GetMinima() const {return fMinima;}
 
 void 
-Minuit::Initialise(){
+Minuit::Initialise(TestStatistic * testStat_){
     delete fMinimiser;
     fMinimiser = NULL;
-
-    // max or min?
-    if(fMaximising)
-        fMinuitFCN.SetSignFlip(true);
 
     // check everything makes sense
     if( !HasSameKeys(fMinima, fMaxima))
@@ -92,17 +88,29 @@ Minuit::Initialise(){
                          << "Initial Values for :\n" << ToString(GetKeys(fInitialValues)) << "\n"
                          << "Initial Errors for :\n" << ToString(GetKeys(fInitialErrors)) << "\n"
                          );
-    
-    // impose a set ordering on the parameters, so they can be reliably referenced (minuit does vectors we do maps)
+
+    // take a copy of these here to make sure we hit the same order each time - minuit uses vector we use set/map...
     fParameterNames = GetKeys(fInitialErrors);
-    
+
+    // pass this ordering on to the called function so it knows the right order too
+    fMinuitFCN = MinuitFCN(testStat_, fParameterNames);
+
+    // max or min?
+    if(fMaximising)
+        fMinuitFCN.SetSignFlip(true);
+
+
     // Create parameters and set limits
     MnUserParameters params(GetValues(fInitialValues, fParameterNames), GetValues(fInitialErrors, fParameterNames));
 
-    if(fMinima.size() && fMaxima.size())
-        for(size_t i = 0; i < fParameterNames.size(); i++)
-            params.SetLimits(i, fMinima[fParameterNames.at(i)], fMaxima[fParameterNames.at(i)]);
-    
+    if(fMinima.size() && fMaxima.size()){
+        int i = 0;
+        for(std::set<std::string>::iterator it = fParameterNames.begin();
+            it != fParameterNames.end(); ++it){
+            params.SetLimits(i++, fMinima[*it], fMaxima[*it]);
+        }
+    }
+
     if("Migrad" == fMethod)
         fMinimiser = new MnMigrad(fMinuitFCN, params);
     
@@ -140,16 +148,14 @@ Minuit::GetMaxCalls() const {
 const FitResult&
 Minuit::Optimise(TestStatistic* testStat_){
     testStat_ -> RegisterFitComponents();
-    
-    fMinuitFCN = MinuitFCN(testStat_, fParameterNames);
-    Initialise();
+
+    Initialise(testStat_);
 
     if(testStat_->GetParameterNames() != fParameterNames)
         throw LogicError(Formatter() << "Minuit config parameters don't match the test statistic!\n" 
                          << "TestStatistic:\n" << ToString(testStat_->GetParameterNames()) 
                          << "Minuit:\n" << ToString(fParameterNames)
                          );
-    
 
     // fix the requested parameters
     // first work out which minuit index this refers to
@@ -158,12 +164,16 @@ Minuit::Optimise(TestStatistic* testStat_){
         size_t pos = std::distance(std::find(fParameterNames.begin(), fParameterNames.end(), *it), fParameterNames.begin());
         fMinimiser -> Fix(pos);
     }
-    
+
     // defaults are same as ROOT defaults
     ROOT::Minuit2::FunctionMinimum fnMin  = fMinimiser -> operator()(fMaxCalls, fTolerance); 
 
-    fFitResult.SetBestFit(ContainerTools::VecsToMap(fParameterNames, fMinimiser -> Params()));
+    fFitResult.SetBestFit(ContainerTools::CreateMap(fParameterNames, fMinimiser -> Params()));
     fFitResult.SetValid(fnMin.IsValid());
+    if(fMaximising)
+        fFitResult.SetExtremeVal(-fnMin.Fval());
+    else
+        fFitResult.SetExtremeVal(fnMin.Fval());
     return fFitResult;
 }
 

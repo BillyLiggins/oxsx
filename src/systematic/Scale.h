@@ -22,7 +22,7 @@ class Scale : public Systematic{
     ParameterDict GetParameters() const;
     size_t GetParameterCount() const;
 
-    std::vector<std::string> GetParameterNames() const;
+    std::set<std::string> GetParameterNames() const;
     void   RenameParameter(const std::string& old_, const std::string& new_);
 
     std::string GetName() const;

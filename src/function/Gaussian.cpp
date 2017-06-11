@@ -206,7 +206,7 @@ Gaussian::GetParameterCount() const{
     return fParameterManager.GetParameterCount();
 }
 
-std::vector<std::string>
+std::set<std::string>
 Gaussian::GetParameterNames() const{
     return fParameterManager.GetParameterNames();
 }

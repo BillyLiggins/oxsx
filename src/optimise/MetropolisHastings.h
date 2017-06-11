@@ -3,6 +3,7 @@
 #include <Optimiser.h>
 #include <FitResult.h>
 #include <Histogram.h>
+#include <set>
 
 class TestStatistic;
 class MetropolisHastings : public Optimiser{
@@ -74,7 +75,7 @@ class MetropolisHastings : public Optimiser{
 
     std::vector<Histogram>           f1DProjections;
     std::vector<Histogram>           f2DProjections;
-    std::vector<std::pair<std::string, std::string> > f2DProjNames;
+    std::set<std::pair<std::string, std::string> > f2DProjNames;
 
     Histogram fHist;
     std::vector< std::vector<double> > fSample;

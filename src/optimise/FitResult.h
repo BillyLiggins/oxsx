@@ -14,7 +14,7 @@ typedef std::map<std::string, Histogram> HistMap;
 
 class FitResult{
  public:
-    FitResult() : fStatSpace(NULL), fIsValid(true),  printPrecision(5) {}
+    FitResult() : fStatSpace(NULL), fIsValid(true),  printPrecision(5), fExtremeVal(0) {}
     FitResult(const FitResult&); //deep copy
     FitResult operator=(const FitResult&); //deep copy
     ~FitResult(); // frees stat space
@@ -43,7 +43,9 @@ class FitResult{
 
     HistMap Get1DProjections() const;
     HistMap Get2DProjections() const;
-
+    
+    double GetExtremeVal() const;
+    void   SetExtremeVal(double);
 
  private:
     ParameterDict fBestFit;
@@ -52,6 +54,8 @@ class FitResult{
     HistMap f1DProjections;
     HistMap f2DProjections;
    
+    double fExtremeVal;
+    
     size_t printPrecision;
     bool fIsValid;
 };

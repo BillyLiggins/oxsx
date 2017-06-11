@@ -2,6 +2,7 @@
 #define __OXSX_COMPONENT_MANAGER__
 #include <FitComponent.h>
 #include <vector>
+#include <set>
 #include <string>
 
 class ComponentManager{
@@ -10,7 +11,7 @@ class ComponentManager{
     void AddComponent(FitComponent*);
 
     void SetParameters(const ParameterDict&);
-    std::vector<std::string>  GetParameterNames() const;
+    std::set<std::string>  GetParameterNames() const;
     ParameterDict             GetParameters() const;
     int                       GetTotalParameterCount() const;
     size_t                    GetComponentCount() const;

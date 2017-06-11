@@ -125,9 +125,11 @@ Scale::GetParameterCount() const{
     return 1;
 }
 
-std::vector<std::string>
+std::set<std::string>
 Scale::GetParameterNames() const{
-    return std::vector<std::string>(1, fParamName);
+    std::set<std::string> set;
+    set.insert(fParamName);
+    return set;
 }
 
 void

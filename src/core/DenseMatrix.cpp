@@ -1,6 +1,7 @@
 #include <DenseMatrix.h>
 #include <iostream>
 #include <Exceptions.h>
+#include <Formatter.hpp>
 
 // initalise to zeros
 DenseMatrix::DenseMatrix(int cols_, int rows_){
@@ -61,14 +62,20 @@ DenseMatrix::operator*=(const DenseMatrix& other_){
 
 void
 DenseMatrix::SetZeros(){
-    if(!fNRows && !fNCols)
-        return;
+    if(!fNRows || !fNCols)
+        throw DimensionError(Formatter()<<
+                "DenseMatrix:: Can't set elements to zero. (rows,cols) : ("<<
+                fNRows<<","<<fNCols<<")"  
+                );
     fArmaMat.zeros();
 }
 
 void
 DenseMatrix::SetToIdentity(){
-    if(!fNRows && !fNCols)        
-        return;
+    if(!fNRows || !fNCols)        
+        throw DimensionError(Formatter()<<
+                "DenseMatrix:: Can't set identity as matrix is not square. (rows,cols) : ("<<
+                fNRows<<","<<fNCols<<")"  
+                );
     fArmaMat.eye();
 }
