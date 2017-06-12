@@ -3,6 +3,14 @@
 /* and triggeres their reconstruction. Systematics inside are passed to a set of pdfs to change       */
 /* them                                                                                               */
 /******************************************************************************************************/
+/* What you have decided to do:
+ *  it has become appearent that it is hard to enforce that a pdf can not be acted upon with the same systematic twice.
+ *  It is end Jack said that we should have something like  AddDist("nameOfPdf", {"sys1GroupName","sys2GroupName"}). then you can go through and on adding you say is a systamatic given twice"  
+ *  If it is then that is a problem.
+ *
+ *
+ *  You then apply this by looping over pdfs and applying each group.
+ */
 
 #ifndef __SYSTEMATIC_MANAGER__
 #define __SYSTEMATIC_MANAGER__
@@ -33,6 +41,10 @@ class SystematicManager{
 
     const std::vector<std::string> GetGroups(const std::string& name) const;
 
+    void UniqueSys(const std::vector<std::string>&);
+
+    void AddDist(const BinnedED& pdf, const std::vector<std::string>& syss_);
+
     const SparseMatrix& GetTotalResponse(const std::string& groupName_ = "all" ) const;
 
     void DistortEDs(std::vector<BinnedED>& fWorkingEDs);
@@ -44,7 +56,7 @@ class SystematicManager{
     size_t fNGroups;
     std::map<std::string,SparseMatrix> totalResponses;
     std::map<std::string,std::vector<Systematic*> > groups;
-    std::map<std::string,std::vector<std::string> > EDnames;
+    std::map<std::string,std::vector<std::string> > EDGroups;
     std::vector<std::string> sysOrder; // This isn't used.
 };
 #endif
