@@ -20,12 +20,14 @@ EDManager::AddDist(EventDistribution * pdf_){
     fDists.push_back(pdf_->Clone());    
     fNDists++;
     fNormalisations.resize(fNDists, 0);
+    RegisterParameters();
 }
 
 void
 EDManager::AddDists(const std::vector<EventDistribution*>& pdfs_){
     for(size_t i = 0; i < pdfs_.size(); i++)
         AddDist(pdfs_.at(i));
+    RegisterParameters();
 }
 
 double
@@ -67,7 +69,7 @@ EDManager::RegisterParameters(){
     fParameterManager.Clear();
     std::vector<std::string> parameterNames;
     for(size_t i = 0; i < fDists.size(); i++)
-        parameterNames.push_back(fDists.at(i)->GetName() + " norm");
+        parameterNames.push_back(fDists.at(i)->GetName() + "_norm");
     
     fParameterManager.AddContainer(fNormalisations, parameterNames);
 }    
@@ -113,7 +115,7 @@ EDManager::GetParameterCount() const{
     return fParameterManager.GetParameterCount();
 }
 
-std::vector<std::string>
+std::set<std::string>
 EDManager::GetParameterNames() const{
     return fParameterManager.GetParameterNames();
 }

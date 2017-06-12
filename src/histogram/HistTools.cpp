@@ -4,15 +4,16 @@
 
 std::vector<Histogram>
 HistTools::MakeAllHists(const AxisCollection& axes_,
-                        const std::vector<std::pair<std::string, std::string> >& combinations_){
+                        const std::set<std::pair<std::string, std::string> >& combinations_){
     std::vector<Histogram> hists;
     hists.reserve(combinations_.size());
+    
+    typedef std::set<std::pair<std::string, std::string> >::iterator SetIt;
 
-    for(size_t i = 0; i < combinations_.size(); i++){
-        const std::pair<std::string, std::string>& dims = combinations_.at(i);
+    for(SetIt it = combinations_.begin(); it != combinations_.end(); ++it){
         AxisCollection axes;
-        axes.AddAxis(axes_.GetAxis(dims.first));
-        axes.AddAxis(axes_.GetAxis(dims.second));
+        axes.AddAxis(axes_.GetAxis(it->first));
+        axes.AddAxis(axes_.GetAxis(it->second));
             
         hists.push_back(Histogram(axes));
     }
@@ -25,18 +26,4 @@ HistTools::FillAllHists(std::vector<Histogram>& hists_, const std::map<std::stri
     for(size_t i = 0; i < hists_.size(); i++){
         hists_.at(i).Fill(fillVals_);
     }    
-}
-
-
-std::vector<Histogram> 
-HistTools::MakeAllHists(const AxisCollection& axes_,
-                        const std::vector<std::string>& names_){
-    std::vector<Histogram> hists;
-    hists.reserve(names_.size());
-    for(size_t i = 0; i < names_.size(); i++){
-        AxisCollection axes;
-        axes.AddAxis(axes_.GetAxis(names_.at(i)));
-        hists.push_back(Histogram(axes));
-    }
-    return hists;
 }

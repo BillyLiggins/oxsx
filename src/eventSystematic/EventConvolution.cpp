@@ -114,7 +114,7 @@ EventConvolution::GetParameterCount() const{
     return fDist->GetParameterCount();
 }
 
-std::vector<std::string>
+std::set<std::string>
 EventConvolution::GetParameterNames() const{
     if(!fDist)
         throw NULLPointerAccessError("EventConvolution::GetParameterNames", 

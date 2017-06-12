@@ -33,7 +33,7 @@ ComponentManager::GetParameters() const{
     return pd;
 }
 
-std::vector<std::string>
+std::set<std::string>
 ComponentManager::GetParameterNames() const{
     return GetKeys(GetParameters());
 }

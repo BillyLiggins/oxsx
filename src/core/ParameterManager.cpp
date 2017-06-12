@@ -18,10 +18,10 @@ void
 ParameterManager::SetParameters(const ParameterDict& params_){
     try{
         for(ParameterDict::const_iterator it = params_.begin(); it != params_.end(); ++it)
-            fParamPtrs[it->first]->Set(it->second);
+            fParamPtrs.at(it->first)->Set(it->second);
     }
     catch(const std::out_of_range& e_){
-        throw ParameterError("Parameters missing from set dict! \n " + CompareKeys(params_, fParamPtrs, "Set Dict", "Parameter Names"));
+        throw ParameterError("Parameters missing from set dict! \n " + CompareKeys(fParamPtrs, params_, "Parameter Names", "SetDict"));
     }
 }
 
@@ -34,7 +34,7 @@ ParameterManager::GetParameters() const{
     return returnD;
 }
 
-std::vector<std::string>
+std::set<std::string>
 ParameterManager::GetParameterNames() const{
     return GetKeys(fParamPtrs);
 }

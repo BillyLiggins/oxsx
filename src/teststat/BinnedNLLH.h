@@ -58,7 +58,7 @@ class BinnedNLLH : public TestStatistic{
     void SetParameters(const ParameterDict&);
     ParameterDict GetParameters() const;
     int  GetParameterCount() const;
-    std::vector<std::string> GetParameterNames() const;
+    std::set<std::string> GetParameterNames() const;
     double Evaluate();
 
  private:

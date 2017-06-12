@@ -1,6 +1,7 @@
 #include  <SparseMatrix.h>
 #include  <iostream>
 #include  <Exceptions.h>
+#include  <Formatter.hpp>
 
 // Initialise to zeros
 SparseMatrix::SparseMatrix(int cols_, int rows_){
@@ -63,9 +64,22 @@ SparseMatrix::operator*=(const SparseMatrix& other_){
 
 void
 SparseMatrix::SetZeros(){
-    if(!fNRows && !fNCols)
-        return;
+    if(!fNRows || !fNCols)
+        throw DimensionError(Formatter()<<
+                "SparseMatrix:: Can't set elements to zero. (rows,cols) : ("<<
+                fNRows<<","<<fNCols<<")"  
+                );
     fArmaMat = arma::sp_mat(fNCols, fNRows);
+}
+
+void
+SparseMatrix::SetToIdentity(){
+    if(!fNRows || !fNCols || fNCols!=fNRows )
+        throw DimensionError(Formatter()<<
+                "SparseMatrix:: Can't set identity as matrix is not square. (rows,cols) : ("<<
+                fNRows<<","<<fNCols<<")"  
+                );
+    fArmaMat.eye();
 }
 
 // FIXME: unsigned vs. size_t

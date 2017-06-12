@@ -158,15 +158,16 @@ MetropolisHastings::Optimise(TestStatistic* testStat_){
 
     // 1. Choose a random starting point or the user defined one
     ParameterDict currentStep;
-    std::vector<std::string> parameterNames = testStat_->GetParameterNames();
+    std::set<std::string> parameterNames = testStat_->GetParameterNames();
     if(fInitialTrial.size())
       currentStep = fInitialTrial;
     else{
-        for(size_t i = 0; i < parameterNames.size(); i++){
-            const std::string& name = parameterNames.at(i);            
+        for(std::set<std::string>::iterator it = parameterNames.begin(); 
+        it != parameterNames.end(); ++it){
+        const std::string& name = *it;
             currentStep[name] = fMinima[name] + Rand::Uniform() * (fMaxima[name] - fMinima[name]);
         }
-    }
+}
 
     std::cout << "Metropolis Hastings::Initial Position @:" << std::endl;
     for(ParameterDict::iterator it = currentStep.begin(); it != currentStep.end(); ++it)
@@ -190,7 +191,7 @@ MetropolisHastings::Optimise(TestStatistic* testStat_){
             }
         }
       
-        if(!(i%100000))
+        if(!(i%10000))
             std::cout << i << "  /  " << fMaxIter 
               << "\t" << (i - fRejectionRate) / static_cast<double>(i) << std::endl;
 
@@ -212,6 +213,7 @@ MetropolisHastings::Optimise(TestStatistic* testStat_){
     fFitResult.SetValid(true);
     if(!fSaveFullHistogram)
       SaveProjections();
+    fFitResult.SetExtremeVal(fMaxVal);
 
     return fFitResult;
 }
@@ -323,13 +325,14 @@ MetropolisHastings::InitialiseHistograms(){
     
     // otherwise take a guess
     else{
-        std::vector<std::string> paramNames = pTestStatistic->GetParameterNames();
-        for(size_t i = 0; i < fMinima.size(); i++){            
-            const std::string& name = paramNames.at(i);
+        std::set<std::string> paramNames = pTestStatistic->GetParameterNames();
+        for(std::set<std::string>::iterator it =  paramNames.begin();
+            it != paramNames.end(); ++it){
+            const std::string& name = *it;
             double max = fMaxima.at(name);
             if(max == fMinima.at(name))
                 max += 0.01;
-            histAxes.AddAxis(BinAxis(paramNames.at(i), fMinima.at(name), max,
+            histAxes.AddAxis(BinAxis(name, fMinima.at(name), max,
                                      int(pow(fMaxIter, 1./fMinima.size()))));
         }
     }

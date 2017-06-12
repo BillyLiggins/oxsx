@@ -2,6 +2,7 @@
 #define __OXSX_PARAMETER_MANAGER__
 #include <vector>
 #include <map>
+#include <set>
 #include <string>
 #include <iostream>
 #include <ParameterDict.h>
@@ -35,7 +36,7 @@ class ParameterManager{
     ParameterDict  GetParameters() const;
     virtual size_t GetParameterCount() const;
 
-    virtual std::vector<std::string> GetParameterNames() const;
+    virtual std::set<std::string> GetParameterNames() const;
     virtual void   RenameParameter(const std::string& old_, const std::string& new_);
 
  private:

@@ -24,7 +24,7 @@ class ChiSquare : public TestStatistic{
     int    GetParameterCount() const;
     void   SetParameters(const ParameterDict& params_);
     ParameterDict GetParameters() const;
-    std::vector<std::string> GetParameterNames() const;
+    std::set<std::string> GetParameterNames() const;
     
  private:
     bool              fCalculatedDataDist;

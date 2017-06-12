@@ -64,9 +64,11 @@ EventReconvolution::GetParameterCount() const{
     return 1;
 }
 
-std::vector<std::string>
+std::set<std::string>
 EventReconvolution::GetParameterNames() const{
-    return std::vector<std::string>(1, fParamName);
+    std::set<std::string> ret;
+    ret.insert(fParamName);
+    return ret;
 }
 
 void

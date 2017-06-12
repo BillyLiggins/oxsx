@@ -3,6 +3,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <set>
 
 
 class AxisCollection;
@@ -11,11 +12,14 @@ class Histogram;
 class HistTools{
  public:
     static std::vector<Histogram> MakeAllHists(const AxisCollection&, 
-                                               const std::vector<std::pair<std::string, std::string> >& combinations_);
+                                               const std::set<std::pair<std::string, std::string> >& combinations_);
 
+    template<typename T1>
     static std::vector<Histogram> MakeAllHists(const AxisCollection&, 
-                                               const std::vector<std::string>& names_);
+                                               const T1& names_);
 
     static void FillAllHists(std::vector<Histogram>&, const std::map<std::string, double>& fillvals);
 };
+
+#include <HistTools.hpp>
 #endif
