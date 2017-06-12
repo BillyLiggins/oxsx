@@ -67,7 +67,23 @@ TEST_CASE("SystematicManager"){
     man.AddSystematics(sys1);
     man.AddSystematics(sys2,"groupName");
 
+    std::vector<std::string> appliedGroups;
+    appliedGroups.push_back("groupName");
+    man.AddDist(pdf1,appliedGroups); 
+
     man.DistortEDs(pdfs);
+
+    SECTION("Set group names correctly"){
+        std::vector<std::string> name =  man.GetGroupNames();
+        REQUIRE( name == "groupName" );
+    }
+
+    SECTION("Counting systematics"){
+        int n =  man.GetNSystematics();
+        REQUIRE( n == 2);
+        n =  man.GetNSystematicsInGroup("groupName");
+        REQUIRE( n == 1);
+    }
 
     SECTION("Applying identity does nothing"){
 

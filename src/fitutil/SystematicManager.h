@@ -20,11 +20,10 @@
 
 class SystematicManager{
  public:
-    SystematicManager() {;}
+    SystematicManager(): fNSystematics(0) {;}
     ~SystematicManager() {}
 
     void Add(Systematic*,const std::string& groupName_ = "default");
-    void AddPdfToGroup(const std::string& groupName_, BinnedED& ED_);
 
     const std::map<std::string,std::vector<Systematic*> >& GetSystematicsGroup() const;
 
@@ -43,7 +42,6 @@ class SystematicManager{
 
     const std::vector<std::string> GetGroups(const std::string& name) const;
 
-    void UniqueSys(const std::vector<std::string>&);
 
     void AddDist(const BinnedED& pdf, const std::vector<std::string>& syss_);
 
@@ -54,10 +52,11 @@ class SystematicManager{
     void Construct();
     
  private:
+    size_t fNSystematics;
     size_t fNGroups;
-    std::map<std::string,SparseMatrix> totalResponses;
-    std::map<std::string,std::vector<Systematic*> > groups;
-    std::map<std::string,std::vector<std::string> > EDGroups;
-    std::vector<std::string> sysOrder; // This isn't used.
+    std::map<std::string,SparseMatrix> fTotalReponses;
+    std::map<std::string,std::vector<Systematic*> > fGroups;
+    std::map<std::string,std::vector<std::string> > fEDGroups;
+    void UniqueSystematics(const std::vector<std::string>&);
 };
 #endif
