@@ -1,26 +1,40 @@
 #include <SystematicManager.h>
 #include <Exceptions.h>
+#include <Formatter.hpp>
 
-const int&
-SystematicManager::GetNSystematicsInGroup(std::string & name) const{
-    return group[name].size();
+const size_t
+SystematicManager::GetNSystematicsInGroup(const std::string& name) const{
+    try{
+        return groups.at(name).size();
+    }
+    catch(const std::out_of_range& e_){
+        throw NotFoundError(Formatter()<<
+                "SystematicManager :: name : "<< 
+                name <<
+                " not found in systematic map");
+    }
 }
 
 const std::vector<Systematic*>&
-SystematicManager::GetSystematicsInGroup(std::string & name) const{
-    return group[name];
+SystematicManager::GetSystematicsInGroup(const std::string& name) const{
+    try{
+        return groups.at(name);
+    }
+    catch(const std::out_of_range& e_){
+        throw NotFoundError(Formatter()<<
+                "SystematicManager :: name : "<< 
+                name <<
+                " not found in systematic map");
+    }
 }
 
-const std::vector<std::string>& 
-SystematicManager::GetGroupNames(std::string & name) const{
-    
+const std::vector<std::string>
+SystematicManager::GetGroups(const std::string& name) const{
     std::vector<std::string> names;
-    for (std::map<std::string,std::vector<Systematic*> >::const_iterator GroupName =group.begin(); GroupName != group.end(); ++GroupName ) {
-        names.push_back(GroupName->first);
-
-
+    for (std::map<std::string,std::vector<Systematic*> >::const_iterator group =groups.begin(); group != groups.end(); ++group ) {
+        names.push_back(group->first);
+    }
     return names;
-
 }
 
 
@@ -35,62 +49,65 @@ SystematicManager::Construct(){
     if(!groups.size())
         return;
 
-    bool containsAll = false;
+    bool containsAll_ = false;
 
-    for (std::map<std::string,std::vector<Systematic*> >::const_iterator GroupName =groups.begin(); GroupName != groups.end(); ++GroupName ) {
-        // Construct the response matrices
-        // Over all systematics in each group
-        for(size_t i = 0; i < GroupName->second.size(); i++)
-            groups[GroupName->first].at(i) -> Construct();
+    //Construct the response matrices.
+    for (std::map<std::string,std::vector<Systematic*> >::const_iterator group=groups.begin(); group!= groups.end(); ++group ) {
+        //Over all systematics in each group
+        for(size_t i = 0; i < group->second.size(); i++)
+            groups[group->first].at(i) -> Construct();
         
-        if(GroupName->first =="all"){
-            SparseMatrix resp = groups[GroupName->first].at(0) -> GetResponse();
-            for(size_t i = 1; i < GroupName->second.size(); i++)
-                  resp *= groups[GroupName->first].at(i) -> GetResponse();
-            allResponses[GroupName->first]=resp;
-            containsAll = true;
+        if(group->first =="all"){
+            SparseMatrix resp = groups[group->first].at(0) -> GetResponse();
+            for(size_t i = 1; i < group->second.size(); i++)
+                  resp *= groups[group->first].at(i) -> GetResponse();
+            totalResponses[group->first]=resp;
+            containsAll_ = true;
         }
     }
 
     //This loop should construct groups other than the "all".
-    for (std::map<std::string,std::vector<Systematic*> >::const_iterator GroupName =groups.begin(); GroupName != groups.end(); ++GroupName ) {
-
-        // If the "all" group, construct if not the take the "all" group and build upon it.
-        if (GroupName->first != "all" && containsAll) {
-            // What about if the vector doesn't hold anything.
-            SparseMatrix resp = allResponses["all"];
-            for(size_t i = 1; i < GroupName->second.size(); i++)
-                  resp *= groups[GroupName->first].at(i) -> GetResponse();
-            allResponses[GroupName->first]=resp;
+    for (std::map<std::string,std::vector<Systematic*> >::const_iterator group =groups.begin(); group != groups.end(); ++group ) {
+        // If the "all" group do nothing.
+        if (group->first == "all") {
+            continue;
+        // construct if the all group exists then build upon that
+        }else if ( containsAll_ ) {
+            SparseMatrix resp = totalResponses["all"];
+            for(size_t i = 0; i < group->second.size(); i++)
+                  resp *= groups[group->first].at(i) -> GetResponse();
+            totalResponses[group->first]=resp;
+        // else construct the group on its own.
         }else{
-            SparseMatrix resp = groups[GroupName->first].at(0) -> GetResponse();
-            for(size_t i = 1; i < GroupName->second.size(); i++)
-                  resp *= groups[GroupName->first].at(i) -> GetResponse();
-            allResponses[GroupName->first]=resp;
+            SparseMatrix resp = groups[group->first].at(0) -> GetResponse();
+            for(size_t i = 1; i < group->second.size(); i++)
+                  resp *= groups[group->first].at(i) -> GetResponse();
+            totalResponses[group->first]=resp;
 
         }
     }
 }
 
 
-// const SparseMatrix&
 const SparseMatrix&
-SystematicManager::GetTotalResponse(std::string groupName_){
-// SystematicManager::GetTotalResponse(const std::string& groupName_) const{
-    //if groupName_ in group names.
-    // if( allResponses[groupName_] )
-        return allResponses[groupName_];
-    // else 
-    //     throw ValueError("SystematicManager :: Group does exist");
+SystematicManager::GetTotalResponse(const std::string& groupName_) const{
+    try{
+        return totalResponses.at(groupName_);
+    }
+    catch(const std::out_of_range& e_){
+        throw NotFoundError(Formatter()<<
+                "SystematicManager :: name : "<< groupName_<<
+                " not found in systematic map");
+    }
 }
                                         
-size_t
+const size_t
 SystematicManager::GetNSystematics() const{
     return fNSystematics;
 }
 
 void
-SystematicManager::AddSystematic(Systematic* sys_, std::string groupName_){
+SystematicManager::Add(Systematic* sys_, const std::string& groupName_){
      groups[groupName_].push_back(sys_);
      fNGroups++;
      fNSystematics++;
@@ -104,19 +121,21 @@ SystematicManager::AddPdfToGroup(const std::string& groupName_, BinnedED& ED_){
 }
 
 void
-SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_){
-    //You need to loop over your groups and apply everything then whatever is left. 
-    //  - Loop over the groups
-    //  - Get EDs name and find the systematic to apply, things in "everything" dont care about name.
-    //  - Need to think about ordering the systematics in the container because map will iterate in alphabetical order.
-
+SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) {
+    Construct();
     for(size_t j = 0; j < fWorkingEDs_.size(); j++){
-        //Get the name of the ED.
-        std::string name = fWorkingEDs_.at(j).GetName();
+        const std::string name = fWorkingEDs_.at(j).GetName();
 
-        //Is "name" in group X
-        // for each group search if name is in that group.
+        //If all group exist then apply that set of systematics first.
+        if ( EDnames.find("all") == EDnames.end() ){
+            std::vector<std::string> v = EDnames["all"];
+            if (std::find(v.begin(), v.end(), name) != v.end())
+                fWorkingEDs_[j].SetBinContents(GetTotalResponse("all").operator()(fWorkingEDs_.at(j).GetBinContents()));
+        }
+
         for (std::map<std::string,std::vector<std::string> >::const_iterator group = EDnames.begin(); group != EDnames.end(); ++group) {
+            if (group->first == "all")
+                continue;
             std::vector<std::string> v = group->second;
             if (std::find(v.begin(), v.end(), name) != v.end())
                 fWorkingEDs_[j].SetBinContents(GetTotalResponse(group->first).operator()(fWorkingEDs_.at(j).GetBinContents()));

@@ -75,9 +75,8 @@ BinnedNLLH::AddPdf(const BinnedED& pdf_){
 }
 
 void 
-BinnedNLLH::AddSystematic(Systematic* sys_, std::string  group_){
-    // fSystematicManager.Add(sys_);
-    fSystematicManager.AddSystematic(sys_, group_);
+BinnedNLLH::AddSystematic(Systematic* sys_, const std::string&  group_){
+    fSystematicManager.Add(sys_, group_);
 }
 
 void
