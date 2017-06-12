@@ -121,7 +121,7 @@ SystematicManager::AddPdfToGroup(const std::string& groupName_, BinnedED& ED_){
 }
 
 void
-SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) const {
+SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) {
     Construct();
     for(size_t j = 0; j < fWorkingEDs_.size(); j++){
         const std::string name = fWorkingEDs_.at(j).GetName();
@@ -130,7 +130,7 @@ SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) const {
         if ( EDnames.find("all") == EDnames.end() ){
             std::vector<std::string> v = EDnames["all"];
             if (std::find(v.begin(), v.end(), name) != v.end())
-                fWorkingEDs_[j].SetBinContents(GetTotalResponse(group->first).operator()(fWorkingEDs_.at(j).GetBinContents()));
+                fWorkingEDs_[j].SetBinContents(GetTotalResponse("all").operator()(fWorkingEDs_.at(j).GetBinContents()));
         }
 
         for (std::map<std::string,std::vector<std::string> >::const_iterator group = EDnames.begin(); group != EDnames.end(); ++group) {
