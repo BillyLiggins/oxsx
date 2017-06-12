@@ -20,10 +20,10 @@
 
 class SystematicManager{
  public:
-    SystematicManager(): fNSystematics(0) {;}
+    SystematicManager() {;}
     ~SystematicManager() {}
 
-    void Add(Systematic*,const std::string& groupName_ = "all");
+    void Add(Systematic*,const std::string& groupName_ = "default");
     void AddPdfToGroup(const std::string& groupName_, BinnedED& ED_);
 
     const std::map<std::string,std::vector<Systematic*> >& GetSystematicsGroup() const;
@@ -39,20 +39,21 @@ class SystematicManager{
 
     const std::vector<Systematic*>& GetSystematicsInGroup(const std::string& name) const;
 
+    const std::vector<std::string>& GetSystematicsNamesInGroup(const std::string& name) const;
+
     const std::vector<std::string> GetGroups(const std::string& name) const;
 
     void UniqueSys(const std::vector<std::string>&);
 
     void AddDist(const BinnedED& pdf, const std::vector<std::string>& syss_);
 
-    const SparseMatrix& GetTotalResponse(const std::string& groupName_ = "all" ) const;
+    const SparseMatrix& GetTotalResponse(const std::string& groupName_ = "default" ) const;
 
     void DistortEDs(std::vector<BinnedED>& fWorkingEDs);
 
     void Construct();
     
  private:
-    size_t fNSystematics;
     size_t fNGroups;
     std::map<std::string,SparseMatrix> totalResponses;
     std::map<std::string,std::vector<Systematic*> > groups;

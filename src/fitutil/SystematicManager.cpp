@@ -15,6 +15,25 @@ SystematicManager::GetNSystematicsInGroup(const std::string& name) const{
     }
 }
 
+const std::vector<std::string>&
+SystematicManager::GetSystematicsNamesInGroup(const std::string& name) const{
+    try{
+        std::vector<Systematic*> sys = groups.at(name);
+        std::vector<std::string> names;
+        for (int i = 0; i < sys.size(); ++i) {
+            names.push_back(sys.at(i)->GetName());    
+        }
+        return names;
+    }
+    catch(const std::out_of_range& e_){
+        throw NotFoundError(Formatter()<<
+                "SystematicManager :: name : "<< 
+                name <<
+                " not found in systematic map");
+    }
+
+}
+
 const std::vector<Systematic*>&
 SystematicManager::GetSystematicsInGroup(const std::string& name) const{
     try{
@@ -53,11 +72,11 @@ SystematicManager::Construct(){
 
     //Construct the response matrices.
     for (std::map<std::string,std::vector<Systematic*> >::const_iterator group=groups.begin(); group!= groups.end(); ++group ) {
-        //Over all systematics in each group
+        //Over default systematics in each group
         for(size_t i = 0; i < group->second.size(); i++)
             groups[group->first].at(i) -> Construct();
         
-        if(group->first =="all"){
+        if(group->first =="default"){
             SparseMatrix resp = groups[group->first].at(0) -> GetResponse();
             for(size_t i = 1; i < group->second.size(); i++)
                   resp *= groups[group->first].at(i) -> GetResponse();
@@ -66,14 +85,14 @@ SystematicManager::Construct(){
         }
     }
 
-    //This loop should construct groups other than the "all".
+    //This loop should construct groups other than the "default".
     for (std::map<std::string,std::vector<Systematic*> >::const_iterator group =groups.begin(); group != groups.end(); ++group ) {
-        // If the "all" group do nothing.
-        if (group->first == "all") {
+        // If the "default" group do nothing.
+        if (group->first == "default") {
             continue;
-        // construct if the all group exists then build upon that
+        // construct if the default group exists then build upon that
         }else if ( containsAll_ ) {
-            SparseMatrix resp = totalResponses["all"];
+            SparseMatrix resp = totalResponses["default"];
             for(size_t i = 0; i < group->second.size(); i++)
                   resp *= groups[group->first].at(i) -> GetResponse();
             totalResponses[group->first]=resp;
@@ -101,10 +120,10 @@ SystematicManager::GetTotalResponse(const std::string& groupName_) const{
     }
 }
                                         
-const size_t
-SystematicManager::GetNSystematics() const{
-    return fNSystematics;
-}
+// const size_t
+// SystematicManager::GetNSystematics() const{
+//     return fNSystematics;
+// }
 
 void
 SystematicManager::Add(Systematic* sys_, const std::string& groupName_){
@@ -125,7 +144,7 @@ SystematicManager::UniqueSys(const std::vector<std::string>& syss_){
            else
                throw NotFoundError(Formatter()<<
                        "SystematicManager :: Systematic: "<< 
-                       group.at(i).GetName()<<
+                       group.at(i)->GetName()<<
                        " is in more than one group. BAD!!!");
        } 
     }
@@ -137,7 +156,7 @@ void
 SystematicManager::AddDist(const BinnedED& pdf, const std::vector<std::string>& syss_){
     //You name to check that the same systamatic isn't in another group
     UniqueSys(syss_);
-    EDnames[pdf.GetName()] = syss_;
+    EDGroups[pdf.GetName()] = syss_;
      // fNGroups++;
      // fNSystematics++;
 }
@@ -154,32 +173,27 @@ SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) {
     for(size_t j = 0; j < fWorkingEDs_.size(); j++){
         const std::string name = fWorkingEDs_.at(j).GetName();
         
-        //does "all" exist.
-        //If all group exist then apply that set of systematics first.
-        if ( groups.find("all") != groups.end() ){
-            std::vector<Systematic*> v = groups["all"];
-            fWorkingEDs_[j].SetBinContents(GetTotalResponse("all").operator()(fWorkingEDs_.at(j).GetBinContents()));
+        //does "default" exist.
+        //If default group exist then apply that set of systematics first.
+        if ( groups.find("default") != groups.end() ){
+            std::vector<Systematic*> v = groups["default"];
+            fWorkingEDs_[j].SetBinContents(GetTotalResponse("default").operator()(fWorkingEDs_.at(j).GetBinContents()));
         }
 
         //Apply everything else.
         for (int i = 0; i < EDGroups[name].size(); ++i) {
-            std::vector<Systematic*> v = groups[EDGroups.at(i)];
-            fWorkingEDs_[j].SetBinContents(GetTotalResponse(EDGroups.at(i)).operator()(fWorkingEDs_.at(j).GetBinContents()));
+            fWorkingEDs_[j].SetBinContents(GetTotalResponse(EDGroups[name].at(i)).operator()(fWorkingEDs_.at(j).GetBinContents()));
         }
 
-        //is pdf in group?
-
-            
-        //
-        // //If all group exist then apply that set of systematics first.
-        // if ( EDnames.find("all") != EDnames.end() ){
-        //     std::vector<std::string> v = EDnames["all"];
+        // //If default group exist then apply that set of systematics first.
+        // if ( EDnames.find("default") != EDnames.end() ){
+        //     std::vector<std::string> v = EDnames["default"];
         //     if (std::find(v.begin(), v.end(), name) != v.end())
-        //         fWorkingEDs_[j].SetBinContents(GetTotalResponse("all").operator()(fWorkingEDs_.at(j).GetBinContents()));
+        //         fWorkingEDs_[j].SetBinContents(GetTotalResponse("default").operator()(fWorkingEDs_.at(j).GetBinContents()));
         // }
         //
         // for (std::map<std::string,std::vector<std::string> >::const_iterator group = EDnames.begin(); group != EDnames.end(); ++group) {
-        //     if (group->first == "all")
+        //     if (group->first == "default")
         //         continue;
         //     std::vector<std::string> v = group->second;
         //     if (std::find(v.begin(), v.end(), name) != v.end())
