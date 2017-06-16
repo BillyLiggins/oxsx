@@ -82,7 +82,7 @@ SystematicManager::AddDist(const BinnedED& pdf, const std::vector<std::string>& 
 
 
 void
-SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) {
+SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) const {
     for(size_t j = 0; j < fWorkingEDs_.size(); j++){
         const std::string name = fWorkingEDs_.at(j).GetName();
 
@@ -90,15 +90,22 @@ SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) {
         if ( fGroups.find("default") != fGroups.end() )
             fWorkingEDs_[j].SetBinContents(GetTotalResponse("default").operator()(fWorkingEDs_.at(j).GetBinContents()));
 
+        //
+        if(fEDGroups.find(name) == fEDGroups.end())
+            continue;
+            
         //Apply everything else.
-        for (int i = 0; i < fEDGroups[name].size(); ++i) {
+        // for (int i = 0; i < fEDGroups[name].size(); ++i) {
+        for (int i = 0; i < fEDGroups.at(name).size(); ++i) {
             //Check that the group has systematics init. 
-            if (!fGroups[fEDGroups[name].at(i)].size())
+            std::string groupName = fEDGroups.at(name).at(i);
+            if (!fGroups.at( groupName ).size())
                 throw LogicError(Formatter()<<"SystematicManager:: ED "<<
                         name
                         <<" has a systematic group of zero size acting on it");
 
-            fWorkingEDs_[j].SetBinContents(GetTotalResponse(fEDGroups[name].at(i)).operator()(fWorkingEDs_.at(j).GetBinContents()));
+            // fWorkingEDs_[j].SetBinContents(GetTotalResponse(fEDGroups.at(groupName).at(i)).operator()(fWorkingEDs_.at(j).GetBinContents()));
+            fWorkingEDs_[j].SetBinContents(GetTotalResponse(fEDGroups.at(name).at(i)).operator()(fWorkingEDs_.at(j).GetBinContents()));
         }
     }
 }
