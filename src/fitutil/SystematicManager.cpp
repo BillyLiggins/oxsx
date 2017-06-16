@@ -1,6 +1,7 @@
 #include <SystematicManager.h>
 #include <Exceptions.h>
 #include <Formatter.hpp>
+#include <ContainerTools.hpp>
 
 const size_t
 SystematicManager::GetNSystematicsInGroup(const std::string& name) const{
@@ -15,6 +16,14 @@ SystematicManager::GetNSystematicsInGroup(const std::string& name) const{
     }
 }
 
+const std::vector<std::string>&
+SystematicManager::GetGroupNames() const{
+    std::vector<std::string> v;
+    for(std::map<std::string,std::vector<Systematic*> >::const_iterator it = fGroups.begin(); it !=fGroups.end(); ++it) {
+        v.push_back(it->first);
+    }
+    return v;
+}
 const std::vector<std::string>&
 SystematicManager::GetSystematicsNamesInGroup(const std::string& name) const{
     try{

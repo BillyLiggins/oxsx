@@ -30,7 +30,7 @@ class SystematicManager{
     const size_t& GetNSystematicsInGroup(std::string & name) const;
     const std::vector<Systematic*>& GetSystematicsInGroup(std::string & name) const;
 
-    const std::vector<std::string>& GetGroupNames(const std::string & name) const;
+    const std::vector<std::string>& GetGroupNames() const;
     
     const size_t GetNSystematics() const;
 
