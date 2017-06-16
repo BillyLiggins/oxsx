@@ -4,35 +4,35 @@
 #include <Formatter.hpp>
 
 // initalise to zeros
-DenseMatrix::DenseMatrix(int cols_, int rows_){
+DenseMatrix::DenseMatrix(int rows_, int cols_){
     fNCols = cols_;
     fNRows = rows_;
-    fArmaMat = arma::mat(cols_, rows_, arma::fill::zeros);
+    fArmaMat = arma::mat(rows_, cols_, arma::fill::zeros);
 }
 
 void 
-DenseMatrix::SetComponent(size_t col_, size_t row_, double val_){
+DenseMatrix::SetComponent(size_t row_, size_t col_, double val_){
     if (col_ >= fNCols || row_ >= fNRows)
         throw NotFoundError(Formatter()
                             << "Attempted out of bounds access on  matrix ("
                             << row_ <<  "," << col_ << ")."
-                            << "Matrix is (" << fNCols << "x" << fNRows
+                            << "Matrix is (" << fNRows << "x" << fNCols
                             << ")"
                             );
             
-    fArmaMat(col_,row_) = val_;
+    fArmaMat(row_,col_) = val_;
 }
 
 double 
-DenseMatrix::GetComponent(size_t col_, size_t row_) const{
+DenseMatrix::GetComponent(size_t row_, size_t col_) const{
     if (col_ >= fNCols || row_ >= fNRows)
         throw NotFoundError(Formatter()
                             << "Attempted out of bounds access on  matrix ("
                             << row_ <<  "," << col_ << ")."
-                            << "Matrix is (" << fNCols << "x" << fNRows
+                            << "Matrix is (" << fNRows << "x" << fNCols
                             << ")"
                             );
-    return fArmaMat(col_, row_);
+    return fArmaMat(row_, col_);
 }
 
 std::vector<double>
@@ -46,7 +46,7 @@ DenseMatrix::operator() (const std::vector<double>& input_) const{
         throw DimensionError(Formatter() << "DenseMatrix::opeator() : Input vector ("
                                          << input_.size() << ")" 
                                          << " wrong size for Matrix ("
-                                         << fNCols << "x" << fNRows 
+                                         << fNRows << "x" << fNCols 
                                          << " ) to act on");
     }
 
