@@ -4,30 +4,30 @@
 #include <DistTools.h>
 #include <Gaussian.h>
 #include <SystematicManager.h>
+#include <Systematic.h>
 #include <Convolution.h>
 #include <Scale.h>
 #include <iostream>
 
-class FakeSystematic : public Systematic{
+class FakeSystematic : public Convolution{
 public:
     FakeSystematic(const std::string& name_)  {name = name_; }
     ~FakeSystematic()  {}
 
-    BinnedED 
-    operator()(const BinnedED& pdf_) const{;}
-        
+    // BinnedED 
+    // operator()(const BinnedED& pdf_) const{;}
     void SetResponse(const SparseMatrix& responseMatrix_){resp= responseMatrix_;}
     const SparseMatrix& GetResponse() const{return resp;}
         
-    void   SetTransformationObs(const ObsSet&){;}
+    // void   SetTransformationObs(const ObsSet&){;}
+    //
+    // ObsSet GetTransformationObs() const{return ObsSet(3);} 
+    //
+    // void   SetDistributionObs(const ObsSet&){;}
+    // ObsSet GetDistributionObs() const{return ObsSet(3);}
 
-    ObsSet GetTransformationObs() const{;}
-
-    void   SetDistributionObs(const ObsSet&){;}
-    ObsSet GetDistributionObs() const{;}
-
-    const AxisCollection& GetAxes() const{}
-    void  SetAxes(const AxisCollection& axes_){}
+    // const AxisCollection& GetAxes() const{return AxisCollection()}
+    // void  SetAxes(const AxisCollection& axes_){}
 
     void Construct() {;}
 
@@ -44,7 +44,7 @@ public:
     std::string GetName() const {return name;};
     void SetName(const std::string& name_) {name = name_;};
 private:
-    std::string name;
+    std::string& name;
     SparseMatrix resp;
 };
 
