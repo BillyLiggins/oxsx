@@ -128,7 +128,7 @@ TEST_CASE("SystematicManager"){
             anotherGroup.push_back("anotherGroup");
             man.AddDist(pdf2,anotherGroup); 
             man.DistortEDs(pdfs);
-        }catch(const LogicError& e_){
+        }catch(const NotFoundError& e_){
             flag=1;
         }
 

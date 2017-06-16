@@ -52,7 +52,7 @@ SystematicManager::UniqueSystematics(const std::vector<std::string>& syss_){
     std::vector<std::string> allname;
     for (int i = 0; i <syss_.size(); ++i) {
         //What about if group doesn't exist.
-        if(fGroups.find( syss_.at(i)) != fGroups.end())
+        if(fGroups.find( syss_.at(i) ) == fGroups.end())
             throw NotFoundError (
                     Formatter()<<"SystematicManager:: Systematic group "<<
                     syss_.at(i)<<
