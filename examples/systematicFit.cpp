@@ -33,8 +33,6 @@
 #include <BinnedEDGenerator.h>
 #include <SystematicManager.h>
 #include <BinnedNLLH.h>
-#include <FileManager.h>
-// #include <CompositeBinnedNLLH.h>
 #include <FitResult.h>
 #include <Minuit.h>
 #include <DistTools.h>
@@ -45,6 +43,9 @@
 #include <BoolCut.h>
 #include <BoxCut.h>
 #include <Gaussian.h>
+#include <ParameterDict.h>
+#include <ContainerTools.hpp>
+
 
 void padPDFs(std::vector<BinnedED>& binnedEDList){
     std::cout<<"Padding Now"<<std::endl;
@@ -93,10 +94,10 @@ int function(){
     pdf3.SetObservables(0);
     pdf4.SetObservables(0);
 
-    pdf1.Scale(400);
-    pdf2.Scale(400);    
-    // pdf1.Normalise();
-    // pdf2.Normalise();    
+    pdf1.Scale(40000);
+    pdf2.Scale(40000);    
+    pdf1.Normalise();
+    pdf2.Normalise();    
 
     std::vector<BinnedED> mcPdfs;
     mcPdfs.push_back(pdf1);
@@ -109,6 +110,7 @@ int function(){
     dataPdfs.push_back(pdf4);
     padPDFs(dataPdfs);
 
+
     BinnedEDGenerator dataGen;
     dataGen.SetPdfs(dataPdfs);
     std::vector<double> rates(2,50000);
@@ -118,102 +120,130 @@ int function(){
     // BinnedED fakeData= dataGen.PoissonFluctuatedED();
     {
         TCanvas c1;
-        c1.SetLogy();
+        // c1.SetLogy();
         // TH1D base("base","base",200,0,10);
         TH1D dataHist = DistTools::ToTH1D(fakeData);
         TH1D hist1 =  DistTools::ToTH1D(pdf1);
         TH1D hist2 =  DistTools::ToTH1D(pdf2);
-        dataHist.Draw();
+        // dataHist.Draw();
         hist1.Draw("same");
         hist2.Draw("same");
         c1.Print("setup.png");
     }
- 
-    // // Only interested in energy RECO bit of the ntuple (energy).
-    // ObsSet obsSet_reco(4);
-    // BinnedED first_RECO("Bi210_reco",axes); first_RECO.SetObservables(obsSet_reco);
-    // BinnedED second_RECO("Po210_reco",axes); second_RECO.SetObservables(obsSet_reco);
-    // std::vector<BinnedED> DataPdfs;
-    // DataPdfs.push_back(first_RECO);
-    // DataPdfs.push_back(second_RECO);
-    //
-    // fileMan_RECO.AddCuts(cutCol_reco);
-    // fileMan_RECO.FillEDs(DataPdfs);
-    // padPDFs(DataPdfs);
-    //
-    // std::vector<TH1D> hists;
-    // for (int i = 0; i < pdfs.size(); ++i) {
-    //     hists.push_back(DistTools::ToTH1D(pdfs.at(i)));
+
+    ObsSet  obsSet(0);
+
+    Convolution* conv_a = new Convolution("conv_a");
+    Gaussian gaus_a(0,1,"gaus_a"); 
+    conv_a->SetFunction(&gaus_a);
+    conv_a->SetAxes(axes);
+    conv_a->SetTransformationObs(obsSet);
+    conv_a->SetDistributionObs(obsSet);
+    conv_a->Construct();
+
+    Convolution* conv_b = new Convolution("conv_b");
+    Gaussian gaus_b(0,1,"gaus_b"); 
+    conv_b->SetFunction(&gaus_b);
+    conv_b->SetAxes(axes);
+    conv_b->SetTransformationObs(obsSet);
+    conv_b->SetDistributionObs(obsSet);
+    conv_b->Construct();
+
+    Scale* scale_a= new Scale("Scale_a");
+    scale_a->SetAxes(axes);
+
+    scale_a->SetTransformationObs(obsSet);
+    scale_a->SetDistributionObs(obsSet);
+
+    scale_a->Construct();
+
+    Scale* scale_b= new Scale("Scale_b");
+    scale_b->SetAxes(axes);
+
+    scale_b->SetTransformationObs(obsSet);
+    scale_b->SetDistributionObs(obsSet);
+
+    scale_b->Construct();
+
+    // Setting optimisation limits
+    ParameterDict minima;
+    minima["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
+    minima["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
+    minima["gaus_a_1"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["gaus_a_2"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["gaus_b_1"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["gaus_b_2"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["scale_a_1"] = 0.9;               // normalisation of Bi210 in data set A
+    minima["scale_b_1"] = 0.9;               // normalisation of Bi210 in data set A
+
+    ParameterDict maxima;
+    maxima["a_mc_norm"] = 100000;               // normalisation of Bi210 in data set A
+    maxima["b_mc_norm"] = 100000;               // normalisation of Bi210 in data set A
+    maxima["gaus_a_1"] = 1;               // normalisation of Bi210 in data set A
+    maxima["gaus_a_2"] = 1;               // normalisation of Bi210 in data set A
+    maxima["gaus_b_1"] = 1;               // normalisation of Bi210 in data set A
+    maxima["gaus_b_2"] = 1;               // normalisation of Bi210 in data set A
+    maxima["scale_a_1"] = 1.1;               // normalisation of Bi210 in data set A
+    maxima["scale_b_1"] = 1.1;               // normalisation of Bi210 in data set A
+
+    Rand rand;
+
+    ParameterDict initialerr;
+    initialerr["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
+
+    ParameterDict initialval;
+    initialval["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
+    initialval["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
+    initialval["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
+    initialval["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
+
+    //Setting  up the combined likelihood.
+    int BuffLow  =10;
+    int BuffHigh =10;
+
+    BinnedNLLH lh; 
+    lh.SetBufferAsOverflow(false);
+    lh.SetBuffer(0,BuffLow,BuffHigh);
+    lh.SetDataDist(fakeData); // initialise with the data set
+    lh.AddPdfs(mcPdfs);
+    lh.AddSystematic(conv_a,"aGroup");
+    lh.AddSystematic(scale_a,"aGroup");
+    lh.AddSystematic(conv_b,"bGroup");
+    lh.AddSystematic(scale_b,"bGroup");
+    std::cout << "here" << std::endl;
+    lh.RegisterFitComponents();
+    std::cout << "here" << std::endl;
+
+    std::cout << lh.GetParameterNames().size() << std::endl;
+    // for (int i = 0; i <lh.GetParameterNames().size(); ++i) {
+    //     // std::cout << ContainerTools::GetValues(lh.GetParameterNames()) << std::endl;
+    //     std::cout <<lh.GetParameterNames().at(i) << std::endl;
     // }
-    // for (int i = 0; i < DataPdfs.size(); ++i) {
-    //     hists.push_back(DistTools::ToTH1D(DataPdfs.at(i)));
-    // }
-    //
-    // for(int i =0;i<pdfs.size();i++){
-    //     pdfs.at(i).Normalise();
-    // }
-    // for(int i =0;i<DataPdfs.size();i++){
-    //     DataPdfs.at(i).Normalise();
-    // }
-    //
-    // //Now make systematics
-    //
-    // bool Qsys = 1;
-    // bool Qsec = 1;
-    // bool Qmc = 0;
-    // Convolution* conv = new Convolution("Bi210_Smear");
-    // Gaussian gaus(0,1,"Bi210_Gaus"); 
-    // conv->SetFunction(&gaus);
-    //
-    // // RunEnergy func(0,1,0);
-    // // conv->SetFunction(&func);
-    //
-    // //axes is the axisCollection of the full fit.
-    // conv->SetAxes(axes);
-    //
-    // ObsSet  obsToSmear(2);
-    //
-    // conv->SetTransformationObs(obsToSmear);
-    // //obsSet is the full data Rep. Which contains indices [0,2] which corrsponds to the bit 0 and 2 of the ntuples i'm using 
-    // conv->SetDistributionObs(obsSet);
-    //
-    // conv->Construct();
-    //
-    // Scale* scale= new Scale("Bi210_Scale");
-    // scale->SetAxes(axes);
-    //
-    // scale->SetTransformationObs(obsToSmear);
-    // //obsSet is the full data Rep. Which contains indices [0,2] which corrsponds to the bit 0 and 2 of the ntuples i'm using 
-    // scale->SetDistributionObs(obsSet);
-    //
-    // scale->Construct();
-    //
-    // Convolution* PoConv = new Convolution("Po210_Smear");
-    // Gaussian PoGaus(0,1,"Po210_Gaus"); 
-    // PoConv->SetFunction(&PoGaus);
-    //
-    // PoConv->SetAxes(axes);
-    //
-    //
-    // PoConv->SetTransformationObs(obsToSmear);
-    // //obsSet is the full data Rep. Which contains indices [0,2] which corrsponds to the bit 0 and 2 of the ntuples i'm using 
-    // PoConv->SetDistributionObs(obsSet);
-    //
-    // // PoConv->MakeFittable();
-    // PoConv->Construct();
-    //
-    // Scale* PoScale= new Scale("Po210_Scale");
-    // PoScale->SetAxes(axes);
-    //
-    // PoScale->SetTransformationObs(obsToSmear);
-    // //obsSet is the full data Rep. Which contains indices [0,2] which corrsponds to the bit 0 and 2 of the ntuples i'm using 
-    // PoScale->SetDistributionObs(obsSet);
-    //
-    // PoScale->Construct();
-    //
-    // // Convolution * PoConv = conv;
-    // // Scale * PoScale = scale;
-    //
+
+
+    Minuit min;
+    // min.SetMethod("Simplex");
+    // min.SetMethod("Minimize");
+    min.SetMaxCalls(10000);
+    min.SetMinima(minima);
+    min.SetMaxima(maxima);
+    min.SetInitialValues(initialval);
+    min.SetInitialErrors(initialerr);
+
+    std::cout << "About to Fit" << std::endl;
+    FitResult result = min.Optimise(&lh);
+
     // SystematicManager SysManager;
     // SysManager.AddSystematic(conv,"ele");
     // SysManager.AddSystematic(scale,"ele");
@@ -224,106 +254,6 @@ int function(){
     // SysManager.AddSystematic(PoScale,"alpha");
     // SysManager.AddPdfToGroup(std::string("alpha"),pdfs.at(1) );
     //
-    // // // Setting optimisation limits
-    // // std::vector<double> minima;
-    // // minima.push_back(10);               // normalisation of Bi210 in data set A
-    // // minima.push_back(10);               // normalisation of Po210 in data set A
-    // // if(Qsys) minima.push_back(0.0);             // Gaussian mean and sigma
-    // // if(Qsys) minima.push_back(0);
-    // // if(Qsys) minima.push_back(0.99999);             // Scale in data set A
-    // // if(Qsys) if(Qsec)  minima.push_back(0.0);             // Gaussian mean and sigma
-    // // if(Qsys) if(Qsec)  minima.push_back(0.);
-    // // if(Qsys) if(Qsec)  minima.push_back(0.90);            // Scale in data set A
-    // //
-    // // std::vector<double> maxima;
-    // // maxima.push_back(100000);               // normalisation of Bi210 in data set A
-    // // maxima.push_back(100000);               // normalisation of Po210 in data set A
-    // // if(Qsys) maxima.push_back(0.101001);             // Gaussian mean and sigma
-    // // if(Qsys) maxima.push_back(1.42);
-    // // if(Qsys) maxima.push_back(1.001);            // Scale in data set A
-    // // if(Qsys) if(Qsec)  maxima.push_back(0.10000);             // Gaussian mean and sigma
-    // // if(Qsys) if(Qsec)  maxima.push_back(0.40);
-    // // if(Qsys) if(Qsec)  maxima.push_back(1.01);            // Scale in data set A
-    // //
-    // // Rand rand;
-    // //
-    // // std::vector<double> initialerr;
-    // // initialerr.push_back(1000);               // normalisation of Bi210 in data set A
-    // // initialerr.push_back(1000);               // normalisation of Po210 in data set A
-    // // if(Qsys) initialerr.push_back(0.1);             // Gaussian mean and sigma
-    // // if(Qsys) initialerr.push_back(0.1);
-    // // if(Qsys) initialerr.push_back(0.00001);            // Scale in data set A
-    // // if(Qsys) if(Qsec)  initialerr.push_back(0.1);             // Gaussian mean and sigma
-    // // if(Qsys) if(Qsec)  initialerr.push_back(0.1);
-    // // if(Qsys) if(Qsec)  initialerr.push_back(0.00001);            // Scale in data set A
-    // //
-    // // // std::vector<double> initialerr;
-    // // // for (int i = 0; i < maxima.size(); ++i) {
-    // // //     if(i<
-    // // //     initialerr.push_back(0.1*maxima.at(i));
-    // // // }
-    // //
-    // // std::vector<double> sigmas;
-    // // sigmas.push_back(1);               // normalisation of Bi210 in data set A
-    // // sigmas.push_back(1);               // normalisation of Po210 in data set A
-    // // if(Qsys) sigmas.push_back(1);             // Gaussian mean and sigma
-    // // if(Qsys) sigmas.push_back(1);
-    // // if(Qsys) sigmas.push_back(0.0001);            // Scale in data set A
-    // // // sigmas.push_back(1);               // normalisation of Bi210 in data set B
-    // // // sigmas.push_back(1);               // normalisation of Po210 in data set B
-    // // if(Qsys) if(Qsec)  sigmas.push_back(1);             // Gaussian mean and sigma
-    // // if(Qsys) if(Qsec)  sigmas.push_back(1);
-    // // if(Qsys) if(Qsec)  sigmas.push_back(0.0001);            // Scale in data set A
-    //
-    // std::map<std::string,double> minima;
-    //                         minima["Bi210_norm"]=10;               // normalisation of Bi210 in data set A
-    //                         minima["Po210_norm"]=10;               // normalisation of Po210 in data set A
-    // if(Qsys)                minima["Bi210_Gaus_means"]= 0.0;             // Gaussian mean and sigma
-    // if(Qsys)                minima["Bi210_Gaus_stddevs"]=0;
-    // if(Qsys)                minima["Bi210_Scale"]=0.99999;             // Scale in data set A
-    // if(Qsys) if(Qsec)       minima["Po210_Gaus_means"]= 0.0;            // Gaussian mean and sigma
-    // if(Qsys) if(Qsec)       minima["Po210_Gaus_stddevs"]=0;
-    // if(Qsys) if(Qsec)       minima["Po210_Scale"]=0.99999;            // Scale in data set A
-    //
-    // std::map<std::string,double> maxima;
-    //                         maxima["Bi210_norm"]=100000;                  // normalisation of Bi210 in data set A
-    //                         maxima["Po210_norm"]=100000;                  // normalisation of Po210 in data set A
-    // if(Qsys)                maxima["Bi210_Gaus_means"]= 0.1;            // Gaussian mean and sigma
-    // if(Qsys)                maxima["Bi210_Gaus_stddevs"]=1.42;
-    // if(Qsys)                maxima["Bi210_Scale"]=1.001;        // Scale in data set A
-    // if(Qsys) if(Qsec)       maxima["Po210_Gaus_means"]= 0.1;           // Gaussian mean and sigma
-    // if(Qsys) if(Qsec)       maxima["Po210_Gaus_stddevs"]=0.4;
-    // if(Qsys) if(Qsec)       maxima["Po210_Scale"]=1.1;       // Scale in data set A
-    //
-    // Rand rand;
-    //
-    // std::map<std::string,double> initialerr;
-    //                         initialerr["Bi210_norm"]=100;             // normalisation of Bi210 in data set A
-    //                         initialerr["Po210_norm"]=100;             // normalisation of Po210 in data set A
-    // if(Qsys)                initialerr["Bi210_Gaus_means"]= 0.1;        // Gaussian mean and sigma
-    // if(Qsys)                initialerr["Bi210_Gaus_stddevs"]=0.1;
-    // if(Qsys)                initialerr["Bi210_Scale"]=0.001;             // Scale in data set A
-    // if(Qsys) if(Qsec)       initialerr["Po210_Gaus_means"]= 0.1;        // Gaussian mean and sigma
-    // if(Qsys) if(Qsec)       initialerr["Po210_Gaus_stddevs"]=0.1;
-    // if(Qsys) if(Qsec)       initialerr["Po210_Scale"]=0.0001;               // Scale in data set A
-    //
-    // // std::vector<double> initialerr;
-    // // for (int i = 0; i < maxima.size(); ++i) {
-    // //     if(i<
-    // //     initialerr.push_back(0.1*maxima.at(i));
-    // // }
-    //
-    // // std::vector<double> sigmas;
-    // // sigmas.push_back(1);               // normalisation of Bi210 in data set A
-    // // sigmas.push_back(1);               // normalisation of Po210 in data set A
-    // // if(Qsys) sigmas.push_back(1);             // Gaussian mean and sigma
-    // // if(Qsys) sigmas.push_back(1);
-    // // if(Qsys) sigmas.push_back(0.0001);            // Scale in data set A
-    // // // sigmas.push_back(1);               // normalisation of Bi210 in data set B
-    // // // sigmas.push_back(1);               // normalisation of Po210 in data set B
-    // // if(Qsys) if(Qsec)  sigmas.push_back(1);             // Gaussian mean and sigma
-    // // if(Qsys) if(Qsec)  sigmas.push_back(1);
-    // // if(Qsys) if(Qsec)  sigmas.push_back(0.0001);            // Scale in data set A
     //
     // // int nTest=100;
     // int nTest=1;
