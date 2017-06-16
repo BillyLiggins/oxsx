@@ -89,6 +89,18 @@ Minuit::Initialise(TestStatistic * testStat_){
                          << "Initial Errors for :\n" << ToString(GetKeys(fInitialErrors)) << "\n"
                          );
 
+    for(ParameterDict::iterator it = fMinima.begin(); it != fMinima.end();
+        ++it){
+        if(fMinima[it->first] >= fMaxima[it->first])
+            throw LogicError(Formatter()
+                             << "Minuit initialisation error "
+                             << "Invalid fit range for " << it->first
+                             << " : " << it->second << " - " << fMaxima[it->first]
+                             << "\n"
+                             );
+    }
+
+
     // take a copy of these here to make sure we hit the same order each time - minuit uses vector we use set/map...
     fParameterNames = GetKeys(fInitialErrors);
 
