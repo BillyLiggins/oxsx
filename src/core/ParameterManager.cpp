@@ -65,7 +65,7 @@ void
 ParameterManager::RenameParameter(const std::string& old_, const std::string& new_){
     if(!HasKey(fParamPtrs, old_))
         throw ParameterError("Can't rename " + old_ + " : parameter doesn't exist! Available: \n" + ToString(GetKeys(fParamPtrs)));
-
+    
     if(HasKey(fParamPtrs, new_))
         throw ParameterError("Can't rename " + old_ + " to " + new_  + " : parameter already exists! Available: \n" + ToString(GetKeys(fParamPtrs)));
     // erase the old key and create a new one
