@@ -88,8 +88,10 @@ Gaussian::SetMeansStdDevs(const std::vector<double>& means_,
     fMeans = means_;
     fStdDevs = stdDevs_;
     fNDims = means_.size();
-    fParameterManager.AddContainer(fMeans, "means");
-    fParameterManager.AddContainer(fStdDevs, "stddevs");
+    fFitter.SetMeanNames(fMeans);
+    fFitter.SetStdDevNames(fStdDevs);
+    // fParameterManager.AddContainer(fMeans, "means");
+    // fParameterManager.AddContainer(fStdDevs, "stddevs");
 }
 
 std::vector<double>
@@ -178,37 +180,37 @@ Gaussian::Sample() const{
 ////////////////////////
 void
 Gaussian::RenameParameter(const std::string& old_, const std::string& new_){
-    fParameterManager.RenameParameter(old_, new_);
+    fFitter.RenameParameter(old_, new_);
 }
 
 void
 Gaussian::SetParameter(const std::string& name_, double value_){
-    fParameterManager.SetParameter(name_, value_);
+    fFitter.SetParameter(name_, value_);
 }
 
 double
 Gaussian::GetParameter(const std::string& name_) const{
-    return fParameterManager.GetParameter(name_);
+    return fFitter.GetParameter(name_);
 }
 
 void
 Gaussian::SetParameters(const ParameterDict& ps_){
-    fParameterManager.SetParameters(ps_);
+     fFitter.SetParameters(ps_);
 }
 
 ParameterDict
 Gaussian::GetParameters() const{
-    return fParameterManager.GetParameters();
+    return fFitter.GetParameters();
 }
 
 size_t
 Gaussian::GetParameterCount() const{
-    return fParameterManager.GetParameterCount();
+    return fFitter.GetParameterCount();
 }
 
 std::set<std::string>
 Gaussian::GetParameterNames() const{
-    return fParameterManager.GetParameterNames();
+    return fFitter.GetParameterNames();
 }
 
 std::string

@@ -46,7 +46,8 @@ class Gaussian : public PDF{
     void SetName(const std::string&);
      
  private:
-    ParameterManager fParameterManager;
+    // ParameterManager fParameterManager;
+    GaussianFitter fFitter;
     std::vector<double> fMeans;
     std::vector<double> fStdDevs;
     
