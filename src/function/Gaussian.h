@@ -3,6 +3,7 @@
 #include <PDF.h>
 #include <ParameterManager.h>
 #include <string>
+#include <GaussianFitter.h>
 
 class Gaussian : public PDF{
  public:
@@ -46,7 +47,6 @@ class Gaussian : public PDF{
     void SetName(const std::string&);
      
  private:
-    // ParameterManager fParameterManager;
     GaussianFitter fFitter;
     std::vector<double> fMeans;
     std::vector<double> fStdDevs;

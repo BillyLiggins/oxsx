@@ -23,6 +23,7 @@ Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double
     fMeans   = means_;
     fStdDevs = stdDevs_;
     fCdfCutOff = 6; // default val
+    fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
 }
 
 Gaussian::Gaussian(const std::vector<double>& means_, const std::vector<double>& stdDevs_, const std::string& name_){
@@ -88,8 +89,8 @@ Gaussian::SetMeansStdDevs(const std::vector<double>& means_,
     fMeans = means_;
     fStdDevs = stdDevs_;
     fNDims = means_.size();
-    fFitter.SetMeanNames(fMeans);
-    fFitter.SetStdDevNames(fStdDevs);
+    fFitter.SetMeanNames(fMeans,"means");
+    fFitter.SetStdDevNames(fStdDevs,"stddevs");
     // fParameterManager.AddContainer(fMeans, "means");
     // fParameterManager.AddContainer(fStdDevs, "stddevs");
 }
