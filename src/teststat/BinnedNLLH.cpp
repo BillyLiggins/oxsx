@@ -60,6 +60,11 @@ BinnedNLLH::BinData(){
 }
 
 void
+BinnedNLLH::AddDist(const BinnedED& pdf, const std::vector<std::string>& syss_){
+    fSystematicManager.AddDist(pdf,syss_);
+}
+
+void
 BinnedNLLH::SetPdfManager(const BinnedEDManager& man_){
     fPdfManager = man_;
 }

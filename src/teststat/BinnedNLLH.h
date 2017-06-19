@@ -39,6 +39,8 @@ class BinnedNLLH : public TestStatistic{
     void SetDataSet(DataSet*);
     DataSet* GetDataSet();
 
+    void AddDist(const BinnedED& pdf, const std::vector<std::string>& syss_);
+
     void SetBuffer(size_t dim_, unsigned lower_, unsigned upper_);
     std::pair<unsigned, unsigned> GetBuffer(size_t dim_) const;
     void SetBufferAsOverflow(bool b_); // true by default
