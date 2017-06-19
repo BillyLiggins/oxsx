@@ -193,15 +193,30 @@ BinnedNLLH::RegisterFitComponents(){
     const std::map<std::string, std::vector<Systematic*> > sys_ = fSystematicManager.GetSystematicsGroup();
     std::vector<std::string> alreadyAdded;
     for (std::map<std::string, std::vector<Systematic*> >::const_iterator group_ = sys_.begin(); group_ !=sys_.end(); ++group_) {
+            std::cout <<"group = "<<group_->first<< std::endl;
         for (int i = 0; i < group_->second.size(); ++i) {
-            std::cout << group_->second.at(i)->GetName() << std::endl;
+            // std::cout <<i<<" "<< group_->second.at(i)->GetName() << std::endl;
             if( std::find( alreadyAdded.begin(),alreadyAdded.end(),group_->second.at(i)->GetName() ) == alreadyAdded.end() ){
+                std::cout <<"Adding Sys =  "<< group_->second.at(i)->GetName() << std::endl;
+                //The conv systematic doesn't have any parameters.
+                // it is a fit component but doens't have parameters.
                 fComponentManager.AddComponent( group_->second.at(i) );
                 alreadyAdded.push_back( group_->second.at(i)->GetName() );
             }
         }
     }
+
+    std::cout << "----------" << std::endl;
+    std::cout << fComponentManager.GetTotalParameterCount() << std::endl;
+    // for (ParameterDict::const_iterator group_ = fComponentManager.GetParameters().begin(); group_ != fComponentManager.GetParameters().end(); ++group_) {
+    //             std::cout <<"Parameter  = "<< group_->first << " "<< group_->second << std::endl;
+    // }
+    // std::set<std::string> paraNames = fComponentManager.GetParameterNames();
+    // for (std::set<std::string>::const_iterator it = paraNames.begin(); it !=  paraNames.end(); it++) {
+    //     std::cout << *it;
+    // }
 }
+
 
 void
 BinnedNLLH::SetParameters(const ParameterDict& params_){

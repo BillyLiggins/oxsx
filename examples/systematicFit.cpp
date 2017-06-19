@@ -133,80 +133,127 @@ int function(){
 
     ObsSet  obsSet(0);
 
-    Convolution* conv_a = new Convolution("conv_a");
-    Gaussian gaus_a(0,1,"gaus_a"); 
-    conv_a->SetFunction(&gaus_a);
-    conv_a->SetAxes(axes);
-    conv_a->SetTransformationObs(obsSet);
-    conv_a->SetDistributionObs(obsSet);
-    conv_a->Construct();
-
-    Convolution* conv_b = new Convolution("conv_b");
-    Gaussian gaus_b(0,1,"gaus_b"); 
-    conv_b->SetFunction(&gaus_b);
-    conv_b->SetAxes(axes);
-    conv_b->SetTransformationObs(obsSet);
-    conv_b->SetDistributionObs(obsSet);
-    conv_b->Construct();
-
-    Scale* scale_a= new Scale("Scale_a");
-    scale_a->SetAxes(axes);
-
-    scale_a->SetTransformationObs(obsSet);
-    scale_a->SetDistributionObs(obsSet);
-
-    scale_a->Construct();
-
-    Scale* scale_b= new Scale("Scale_b");
-    scale_b->SetAxes(axes);
-
-    scale_b->SetTransformationObs(obsSet);
-    scale_b->SetDistributionObs(obsSet);
-
-    scale_b->Construct();
+    // Convolution* conv_a = new Convolution("conv_a");
+    // // Gaussian gaus_a(0,1,"gaus_a"); 
+    // Gaussian* gaus_a = new Gaussian(0,1,"gaus_a"); 
+    // gaus_a->RenameParameter("means_0","gaus_a_1");
+    // gaus_a->RenameParameter("stddevs_0","gaus_a_2");
+    // {
+    //     std::cout << "888888" << std::endl;
+    //     std::cout<<gaus_a->GetParameterCount()<<std::endl;
+    //     ParameterDict checker = gaus_a->GetParameters();
+    //
+    //     for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+    //         std::cout << i->first << "\t " << i->second << std::endl; 
+    //     }
+    //     std::cout << "888888" << std::endl;
+    // }
+    //
+    // // conv_a->SetFunction(&gaus_a);
+    // conv_a->SetFunction(gaus_a);
+    //
+    // {
+    //     std::cout << "£££" << std::endl;
+    //     std::cout << conv_a->GetParameterCount() << std::endl;
+    //     ParameterDict checker = conv_a->GetParameters();
+    //
+    //     std::cout << "£££" << std::endl;
+    //     for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+    //         std::cout << i->first << "\t " << i->second << std::endl; 
+    //     }
+    //     std::cout << "£££" << std::endl;
+    // }
+    //
+    // conv_a->SetAxes(axes);
+    // conv_a->SetTransformationObs(obsSet);
+    // conv_a->SetDistributionObs(obsSet);
+    // conv_a->Construct();
+    //
+    // Convolution* conv_b = new Convolution("conv_b");
+    // // Gaussian gaus_b(0,1,"gaus_b"); 
+    // Gaussian * gaus_b = new Gaussian(0,1,"gaus_b"); 
+    // gaus_b->RenameParameter("means_0","gaus_b_1");
+    // gaus_b->RenameParameter("stddevs_0","gaus_b_2");
+    // conv_b->SetFunction(gaus_b);
+    // conv_b->SetAxes(axes);
+    // conv_b->SetTransformationObs(obsSet);
+    // conv_b->SetDistributionObs(obsSet);
+    // conv_b->Construct();
+    //
+    // {
+    //     std::cout << "$$$ "<< std::endl;
+    //     std::cout <<conv_b->GetParameterCount() << std::endl;
+    //     ParameterDict checker = conv_b->GetParameters();
+    //
+    //     std::cout << "$$$" << std::endl;
+    //     for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+    //         std::cout << i->first << "\t " << i->second << std::endl; 
+    //     }
+    //     std::cout << "$$$" << std::endl;
+    // }
+    //
+    // Scale* scale_a= new Scale("Scale_a");
+    // scale_a->RenameParameter("scaleFactor","scale_a_1");
+    // scale_a->SetAxes(axes);
+    // scale_a->SetScaleFactor(1.1);
+    //
+    // scale_a->SetTransformationObs(obsSet);
+    // scale_a->SetDistributionObs(obsSet);
+    //
+    // scale_a->Construct();
+    //
+    // Scale* scale_b= new Scale("Scale_b");
+    // scale_b->RenameParameter("scaleFactor","scale_b_1");
+    // scale_b->SetAxes(axes);
+    // scale_b->SetScaleFactor(1.2);
+    //
+    // scale_b->SetTransformationObs(obsSet);
+    // scale_b->SetDistributionObs(obsSet);
+    //
+    // scale_b->Construct();
 
     // Setting optimisation limits
     ParameterDict minima;
     minima["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
     minima["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
-    minima["gaus_a_1"] = 0.01;               // normalisation of Bi210 in data set A
-    minima["gaus_a_2"] = 0.01;               // normalisation of Bi210 in data set A
-    minima["gaus_b_1"] = 0.01;               // normalisation of Bi210 in data set A
-    minima["gaus_b_2"] = 0.01;               // normalisation of Bi210 in data set A
-    minima["scale_a_1"] = 0.9;               // normalisation of Bi210 in data set A
-    minima["scale_b_1"] = 0.9;               // normalisation of Bi210 in data set A
+    // minima["gaus_a_1"] = 0.01;               // normalisation of Bi210 in data set A
+    // minima["gaus_a_2"] = 0.01;               // normalisation of Bi210 in data set A
+    // minima["gaus_b_1"] = 0.01;               // normalisation of Bi210 in data set A
+    // minima["gaus_b_2"] = 0.01;               // normalisation of Bi210 in data set A
+    // minima["scale_a_1"] = 0.9;               // normalisation of Bi210 in data set A
+    // minima["scale_b_1"] = 0.9;               // normalisation of Bi210 in data set A
 
     ParameterDict maxima;
     maxima["a_mc_norm"] = 100000;               // normalisation of Bi210 in data set A
     maxima["b_mc_norm"] = 100000;               // normalisation of Bi210 in data set A
-    maxima["gaus_a_1"] = 1;               // normalisation of Bi210 in data set A
-    maxima["gaus_a_2"] = 1;               // normalisation of Bi210 in data set A
-    maxima["gaus_b_1"] = 1;               // normalisation of Bi210 in data set A
-    maxima["gaus_b_2"] = 1;               // normalisation of Bi210 in data set A
-    maxima["scale_a_1"] = 1.1;               // normalisation of Bi210 in data set A
-    maxima["scale_b_1"] = 1.1;               // normalisation of Bi210 in data set A
+    // maxima["gaus_a_1"] = 1;               // normalisation of Bi210 in data set A
+    // maxima["gaus_a_2"] = 1;               // normalisation of Bi210 in data set A
+    // maxima["gaus_b_1"] = 1;               // normalisation of Bi210 in data set A
+    // maxima["gaus_b_2"] = 1;               // normalisation of Bi210 in data set A
+    // maxima["scale_a_1"] = 1.1;               // normalisation of Bi210 in data set A
+    // maxima["scale_b_1"] = 1.1;               // normalisation of Bi210 in data set A
 
     Rand rand;
 
     ParameterDict initialerr;
     initialerr["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
     initialerr["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
-    initialerr["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
-    initialerr["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
-    initialerr["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
-    initialerr["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
-    initialerr["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
-    initialerr["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialerr["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialerr["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
+    // initialerr["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialerr["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
+    // initialerr["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialerr["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
 
     ParameterDict initialval;
     initialval["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
     initialval["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
-    initialval["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
-    initialval["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
-    initialval["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
-    initialval["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
-    initialval["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
-    initialval["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialval["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialval["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
+    // initialval["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialval["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
+    // initialval["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
+    // initialval["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
 
     //Setting  up the combined likelihood.
     int BuffLow  =10;
@@ -217,12 +264,12 @@ int function(){
     lh.SetBuffer(0,BuffLow,BuffHigh);
     lh.SetDataDist(fakeData); // initialise with the data set
     lh.AddPdfs(mcPdfs);
-    lh.AddSystematic(conv_a,"aGroup");
-    lh.AddSystematic(scale_a,"aGroup");
-    lh.AddSystematic(conv_b,"bGroup");
-    lh.AddSystematic(scale_b,"bGroup");
+    // lh.AddSystematic(scale_a,"aGroup");
+    // lh.AddSystematic(conv_a,"aGroup");
+    // lh.AddSystematic(conv_b,"bGroup");
+    // lh.AddSystematic(scale_b,"bGroup");
     std::cout << "here" << std::endl;
-    lh.RegisterFitComponents();
+    // lh.RegisterFitComponents();
     std::cout << "here" << std::endl;
 
     std::cout << lh.GetParameterNames().size() << std::endl;
@@ -240,6 +287,14 @@ int function(){
     min.SetMaxima(maxima);
     min.SetInitialValues(initialval);
     min.SetInitialErrors(initialerr);
+
+    ParameterDict checker = lh.GetParameters();
+
+    for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+       std::cout << i->first << "\t " << i->second << std::endl; 
+    }
+    
+    
 
     std::cout << "About to Fit" << std::endl;
     FitResult result = min.Optimise(&lh);
