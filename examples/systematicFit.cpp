@@ -110,6 +110,7 @@ int function(){
     dataPdfs.push_back(pdf4);
     padPDFs(dataPdfs);
 
+
     BinnedEDGenerator dataGen;
     dataGen.SetPdfs(dataPdfs);
     std::vector<double> rates(2,50000);
@@ -274,14 +275,15 @@ int function(){
     lh.AddDist(mcPdfs.at(1),std::vector<std::string>(1,"bGroup"));
 
     std::cout << "here" << std::endl;
-    lh.RegisterFitComponents();
+    // lh.RegisterFitComponents();
     std::cout << "here" << std::endl;
 
     std::cout << lh.GetParameterNames().size() << std::endl;
     // for (int i = 0; i <lh.GetParameterNames().size(); ++i) {
-    //     // std::cout << ContainerTools::ToString(ContainerTools::GetValues(lh.GetParameterNames())) << std::endl;
+    //     // std::cout << ContainerTools::GetValues(lh.GetParameterNames()) << std::endl;
     //     std::cout <<lh.GetParameterNames().at(i) << std::endl;
     // }
+
 
     Minuit min;
     // min.SetMethod("Simplex");
