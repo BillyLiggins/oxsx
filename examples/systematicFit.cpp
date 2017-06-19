@@ -135,6 +135,7 @@ int function(){
     Convolution* conv_a = new Convolution("conv_a");
     // Gaussian gaus_a(0,1,"gaus_a"); 
     Gaussian* gaus_a = new Gaussian(0,1,"gaus_a"); 
+
     gaus_a->RenameParameter("means_0","gaus_a_1");
     gaus_a->RenameParameter("stddevs_0","gaus_a_2");
 
@@ -152,22 +153,25 @@ int function(){
     // conv_a->SetFunction(&gaus_a);
     conv_a->SetFunction(gaus_a);
 
+
+    conv_a->SetAxes(axes);
+    conv_a->SetTransformationObs(obsSet);
+    conv_a->SetDistributionObs(obsSet);
+    conv_a->Construct();
+
     {
         std::cout << "£££" << std::endl;
         std::cout << conv_a->GetParameterCount() << std::endl;
         ParameterDict checker = conv_a->GetParameters();
 
         std::cout << "£££" << std::endl;
-        for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
-            std::cout << i->first << "\t " << i->second << std::endl; 
+        // for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+        for (std::set<std::string>::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+            // std::cout << i->first << "\t " << i->second << std::endl; 
+            std::cout << i->first <<std::endl;
         }
         std::cout << "£££" << std::endl;
     }
-
-    conv_a->SetAxes(axes);
-    conv_a->SetTransformationObs(obsSet);
-    conv_a->SetDistributionObs(obsSet);
-    conv_a->Construct();
 
     Convolution* conv_b = new Convolution("conv_b");
     // Gaussian gaus_b(0,1,"gaus_b"); 
@@ -214,20 +218,20 @@ int function(){
     ParameterDict minima;
     minima["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
     minima["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
-    // minima["gaus_a_1"] = 0.01;               // normalisation of Bi210 in data set A
-    // minima["gaus_a_2"] = 0.01;               // normalisation of Bi210 in data set A
-    // minima["gaus_b_1"] = 0.01;               // normalisation of Bi210 in data set A
-    // minima["gaus_b_2"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["gaus_a_1"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["gaus_a_2"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["gaus_b_1"] = 0.01;               // normalisation of Bi210 in data set A
+    minima["gaus_b_2"] = 0.01;               // normalisation of Bi210 in data set A
     minima["scale_a_1"] = 0.9;               // normalisation of Bi210 in data set A
     minima["scale_b_1"] = 0.9;               // normalisation of Bi210 in data set A
 
     ParameterDict maxima;
     maxima["a_mc_norm"] = 100000;               // normalisation of Bi210 in data set A
     maxima["b_mc_norm"] = 100000;               // normalisation of Bi210 in data set A
-    // maxima["gaus_a_1"] = 1;               // normalisation of Bi210 in data set A
-    // maxima["gaus_a_2"] = 1;               // normalisation of Bi210 in data set A
-    // maxima["gaus_b_1"] = 1;               // normalisation of Bi210 in data set A
-    // maxima["gaus_b_2"] = 1;               // normalisation of Bi210 in data set A
+    maxima["gaus_a_1"] = 1;               // normalisation of Bi210 in data set A
+    maxima["gaus_a_2"] = 1;               // normalisation of Bi210 in data set A
+    maxima["gaus_b_1"] = 1;               // normalisation of Bi210 in data set A
+    maxima["gaus_b_2"] = 1;               // normalisation of Bi210 in data set A
     maxima["scale_a_1"] = 1.1;               // normalisation of Bi210 in data set A
     maxima["scale_b_1"] = 1.1;               // normalisation of Bi210 in data set A
 
@@ -236,20 +240,20 @@ int function(){
     ParameterDict initialerr;
     initialerr["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
     initialerr["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
-    // initialerr["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
-    // initialerr["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
-    // initialerr["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
-    // initialerr["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
+    initialerr["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
     initialerr["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
     initialerr["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
 
     ParameterDict initialval;
     initialval["a_mc_norm"] = 10;               // normalisation of Bi210 in data set A
     initialval["b_mc_norm"] = 10;               // normalisation of Bi210 in data set A
-    // initialval["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
-    // initialval["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
-    // initialval["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
-    // initialval["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_a_1"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_a_2"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_b_1"] = 10;               // normalisation of Bi210 in data set A
+    initialval["gaus_b_2"] = 10;               // normalisation of Bi210 in data set A
     initialval["scale_a_1"] = 10;               // normalisation of Bi210 in data set A
     initialval["scale_b_1"] = 10;               // normalisation of Bi210 in data set A
 
@@ -263,11 +267,12 @@ int function(){
     lh.SetDataDist(fakeData); // initialise with the data set
     lh.AddPdfs(mcPdfs);
     lh.AddSystematic(scale_a,"aGroup");
-    // lh.AddSystematic(conv_a,"aGroup");
-    // lh.AddSystematic(conv_b,"bGroup");
+    lh.AddSystematic(conv_a,"aGroup");
+    lh.AddSystematic(conv_b,"bGroup");
     lh.AddSystematic(scale_b,"bGroup");
     lh.AddDist(mcPdfs.at(0),std::vector<std::string>(1,"aGroup"));
     lh.AddDist(mcPdfs.at(1),std::vector<std::string>(1,"bGroup"));
+
     std::cout << "here" << std::endl;
     lh.RegisterFitComponents();
     std::cout << "here" << std::endl;
@@ -295,6 +300,7 @@ int function(){
     
     std::cout << "About to Fit" << std::endl;
     FitResult result = min.Optimise(&lh);
+    result.Print();
 
     // SystematicManager SysManager;
     // SysManager.AddSystematic(conv,"ele");
