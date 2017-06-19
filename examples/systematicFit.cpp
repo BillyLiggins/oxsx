@@ -110,7 +110,6 @@ int function(){
     dataPdfs.push_back(pdf4);
     padPDFs(dataPdfs);
 
-
     BinnedEDGenerator dataGen;
     dataGen.SetPdfs(dataPdfs);
     std::vector<double> rates(2,50000);
@@ -138,6 +137,7 @@ int function(){
     Gaussian* gaus_a = new Gaussian(0,1,"gaus_a"); 
     gaus_a->RenameParameter("means_0","gaus_a_1");
     gaus_a->RenameParameter("stddevs_0","gaus_a_2");
+
     {
         std::cout << "888888" << std::endl;
         std::cout<<gaus_a->GetParameterCount()<<std::endl;
@@ -196,7 +196,6 @@ int function(){
     scale_a->RenameParameter("scaleFactor","scale_a_1");
     scale_a->SetAxes(axes);
     scale_a->SetScaleFactor(1.1);
-
     scale_a->SetTransformationObs(obsSet);
     scale_a->SetDistributionObs(obsSet);
 
@@ -206,7 +205,6 @@ int function(){
     scale_b->RenameParameter("scaleFactor","scale_b_1");
     scale_b->SetAxes(axes);
     scale_b->SetScaleFactor(1.2);
-
     scale_b->SetTransformationObs(obsSet);
     scale_b->SetDistributionObs(obsSet);
 
@@ -276,10 +274,9 @@ int function(){
 
     std::cout << lh.GetParameterNames().size() << std::endl;
     // for (int i = 0; i <lh.GetParameterNames().size(); ++i) {
-    //     // std::cout << ContainerTools::GetValues(lh.GetParameterNames()) << std::endl;
+    //     // std::cout << ContainerTools::ToString(ContainerTools::GetValues(lh.GetParameterNames())) << std::endl;
     //     std::cout <<lh.GetParameterNames().at(i) << std::endl;
     // }
-
 
     Minuit min;
     // min.SetMethod("Simplex");
@@ -296,8 +293,6 @@ int function(){
        std::cout << i->first << "\t " << i->second << std::endl; 
     }
     
-    
-
     std::cout << "About to Fit" << std::endl;
     FitResult result = min.Optimise(&lh);
 
