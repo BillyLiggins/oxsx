@@ -160,19 +160,19 @@ int function(){
     conv_a->SetDistributionObs(obsSet);
     conv_a->Construct();
 
-    {
-        std::cout << "£££" << std::endl;
-        std::cout << conv_a->GetParameterCount() << std::endl;
-        ParameterDict checker = conv_a->GetParameters();
-
-        std::cout << "£££" << std::endl;
-        // for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
-        for (std::set<std::string>::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
-            // std::cout << i->first << "\t " << i->second << std::endl; 
-            std::cout << i->first <<std::endl;
-        }
-        std::cout << "£££" << std::endl;
-    }
+    // {
+    //     std::cout << "£££" << std::endl;
+    //     std::cout << conv_a->GetParameterCount() << std::endl;
+    //     ParameterDict checker = conv_a->GetParameters();
+    //
+    //     std::cout << "£££" << std::endl;
+    //     // for (std::map<std::string, double >::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+    //     for (std::set<std::string>::const_iterator i = checker.begin(); i !=  checker.end(); ++i) {
+    //         // std::cout << i->first << "\t " << i->second << std::endl; 
+    //         std::cout << i->first <<std::endl;
+    //     }
+    //     std::cout << "£££" << std::endl;
+    // }
 
     Convolution* conv_b = new Convolution("conv_b");
     // Gaussian gaus_b(0,1,"gaus_b"); 
