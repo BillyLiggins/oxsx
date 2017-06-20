@@ -26,19 +26,19 @@ Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double
     fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
 }
 
-Gaussian::Gaussian(const std::vector<double>& means_, const std::vector<double>& stdDevs_, const std::string& name_){
+Gaussian::Gaussian(const std::vector<double>& means_, const std::vector<double>& stdDevs_, const std::string& name_): fFitter(this){
     Initialise(means_, stdDevs_, name_);
 }
 
-Gaussian::Gaussian(size_t nDims_, const std::string& name_){
+Gaussian::Gaussian(size_t nDims_, const std::string& name_): fFitter(this){
     Initialise(std::vector<double>(nDims_, 0), std::vector<double>(nDims_, 1), name_);
 }
 
-Gaussian::Gaussian(double mean_, double stdDev_, const std::string& name_){
+Gaussian::Gaussian(double mean_, double stdDev_, const std::string& name_): fFitter(this){
     Initialise(std::vector<double>(1, mean_), std::vector<double>(1, stdDev_), name_);
 }
 
-Gaussian::Gaussian(){
+Gaussian::Gaussian(): fFitter(this){
     Initialise(std::vector<double>(1, 0), std::vector<double>(1, 1), "");
 }
 

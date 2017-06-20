@@ -11,7 +11,9 @@ class GaussianFitter{
 public:
     GaussianFitter(){;}
     GaussianFitter(Gaussian * func_);
-    ~GaussianFitter ();
+    ~GaussianFitter(){
+        delete fOrignalFunc;
+    }
 
     void SetOriginalFunction(Gaussian* func_);
     void SetMeanNames(const std::vector<double> means_,const std::string& baseName_);

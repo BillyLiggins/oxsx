@@ -8,11 +8,11 @@
 class Gaussian : public PDF{
  public:
     // Constructory things
-    Gaussian();
-    Gaussian(size_t nDims_, const std::string& name_ = ""); // means = 0, stdDevs = 1
-    Gaussian(double mean_, double stdDev_, const std::string& name_ = "");
+    Gaussian(): fFitter(this){}
+    Gaussian(size_t nDims_, const std::string& name_ = ""): fFitter(this); // means = 0, stdDevs = 1
+    Gaussian(double mean_, double stdDev_, const std::string& name_ = ""): fFitter(this);
     Gaussian(const std::vector<double>& mean_, 
-             const std::vector<double>& stdDev_, const std::string& name_ = "");
+             const std::vector<double>& stdDev_, const std::string& name_ = ""): fFitter(this);
     virtual   Function* Clone() const;
 
     // Probability
