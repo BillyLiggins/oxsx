@@ -5,14 +5,23 @@
 #include <string>
 #include <GaussianFitter.h>
 
+// class GaussianFitter;
 class Gaussian : public PDF{
  public:
     // Constructory things
-    Gaussian(): fFitter(this){}
-    Gaussian(size_t nDims_, const std::string& name_ = ""): fFitter(this); // means = 0, stdDevs = 1
-    Gaussian(double mean_, double stdDev_, const std::string& name_ = ""): fFitter(this);
+    Gaussian();
+    Gaussian(size_t nDims_, const std::string& name_ = "");// means = 0, stdDevs = 1
+    Gaussian(double mean_, double stdDev_, const std::string& name_ = "");
     Gaussian(const std::vector<double>& mean_, 
-             const std::vector<double>& stdDev_, const std::string& name_ = ""): fFitter(this);
+             const std::vector<double>& stdDev_, const std::string& name_ = "");
+    // ~Gaussian(){
+    //     delete fFitter;
+    // }
+    // Gaussian();
+    // Gaussian(size_t nDims_, const std::string& name_ = "");// means = 0, stdDevs = 1
+    // Gaussian(double mean_, double stdDev_, const std::string& name_ = "");
+    // Gaussian(const std::vector<double>& mean_, 
+    //          const std::vector<double>& stdDev_, const std::string& name_ = "");
     virtual   Function* Clone() const;
 
     // Probability
@@ -46,6 +55,8 @@ class Gaussian : public PDF{
     std::string GetName() const;
     void SetName(const std::string&);
      
+    void SetMeansStdDevs(const std::vector<double>& means_, 
+                         const std::vector<double>& stdDevs_);
  private:
     GaussianFitter fFitter;
     std::vector<double> fMeans;
@@ -60,8 +71,8 @@ class Gaussian : public PDF{
                       const std::vector<double>& stdDevs_,
                       const std::string& name_);
     
-    // this is private, we want the dimensionality to be fixed at creation
-    void SetMeansStdDevs(const std::vector<double>& means_, 
-                         const std::vector<double>& stdDevs_);
+    // // this is private, we want the dimensionality to be fixed at creation
+    // void SetMeansStdDevs(const std::vector<double>& means_, 
+    //                      const std::vector<double>& stdDevs_);
 };
 #endif

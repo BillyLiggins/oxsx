@@ -1,19 +1,22 @@
-#ifndef __OXSX_GAUSSIANFITTER__
-#define __OXSX_GAUSSIANFITTER__
-#include <Gaussian.h>
+#ifndef __OXSX_GAUSSIAN_FITTER__
+#define __OXSX_GAUSSIAN_FITTER__
+// #include <Gaussian.h>
 #include <vector>      
 #include <string>
 #include <ParameterDict.h>
+#include <set>
 
 class Gaussian;
 
 class GaussianFitter{
 public:
-    GaussianFitter(){;}
-    GaussianFitter(Gaussian * func_);
-    ~GaussianFitter(){
-        delete fOrignalFunc;
+    GaussianFitter(){
+        fOrignalFunc=NULL;
     }
+    // GaussianFitter(Gaussian * func_);
+    // ~GaussianFitter(){
+    //     delete fOrignalFunc;
+    // }
 
     void SetOriginalFunction(Gaussian* func_);
     void SetMeanNames(const std::vector<double> means_,const std::string& baseName_);
