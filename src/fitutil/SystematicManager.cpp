@@ -18,10 +18,9 @@ SystematicManager::Construct(){
 
     //This loop should construct all fGroups.
     for (std::map<std::string,std::vector<Systematic*> >::const_iterator group =fGroups.begin(); group != fGroups.end(); ++group ) {
-        std::cout << "should  be seen"  << std::endl;
         SparseMatrix resp = fGroups[group->first].at(0) -> GetResponse();
+
         for(size_t i = 1; i < group->second.size(); i++){
-            std::cout << "shouldn't be seen"  << std::endl;
             resp *= fGroups[group->first].at(i) -> GetResponse();
         }
         fTotalReponses[group->first]=resp;
@@ -83,11 +82,8 @@ SystematicManager::AddDist(const BinnedED& pdf, const std::vector<std::string>& 
     fEDGroups[pdf.GetName()] = syss_;
 }
 
-
 void
 SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) const {
-    std::cout << "Before" << std::endl;
-    std::cout << fWorkingEDs_.at(0).GetBinContent(5) << std::endl;
     for(size_t j = 0; j < fWorkingEDs_.size(); j++){
         const std::string name = fWorkingEDs_.at(j).GetName();
 
@@ -109,14 +105,10 @@ SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) const {
                         name
                         <<" has a systematic group of zero size acting on it");
 
-            // std::cout << "for name : "<<name << " applying group : "<<groupName << std::endl;
             fWorkingEDs_[j].SetBinContents(GetTotalResponse(groupName).operator()(fWorkingEDs_.at(j).GetBinContents()));
         }
     }
-    std::cout << "After" << std::endl;
-    std::cout << fWorkingEDs_.at(0).GetBinContent(5) << std::endl;
 }
-
 
 //Getters and Setters
 

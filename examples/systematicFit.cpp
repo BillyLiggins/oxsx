@@ -105,7 +105,7 @@ int function(){
     Gaussian gaus4(8, 0.55);
 
     AxisCollection axes;
-    axes.AddAxis(BinAxis("axis1", 0, 10 , 100));
+    axes.AddAxis(BinAxis("axis1", -10, 20 , 100));
 
     BinnedED pdf3("a_data", DistTools::ToHist(gaus1, axes));
     BinnedED pdf4("b_data", DistTools::ToHist(gaus4, axes));
