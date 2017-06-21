@@ -49,13 +49,16 @@ void
 ChiSquare::RegisterFitComponents(){
     fComponentManager.AddComponent(&fPdfManager);
 
-    //Need to get the group loop over all of them.
+    //Because the limits are set by name you only need to make sure you add the systematic once.
     const std::map<std::string, std::vector<Systematic*> > sys_ = fSystematicManager.GetSystematicsGroup();
+    std::vector<std::string> alreadyAdded;
     for (std::map<std::string, std::vector<Systematic*> >::const_iterator group_ = sys_.begin(); group_ !=sys_.end(); ++group_) {
         for (int i = 0; i < group_->second.size(); ++i) {
-            fComponentManager.AddComponent(group_->second.at(i));
+            if( std::find( alreadyAdded.begin(),alreadyAdded.end(),group_->second.at(i)->GetName() ) == alreadyAdded.end() ){
+                fComponentManager.AddComponent( group_->second.at(i) );
+                alreadyAdded.push_back( group_->second.at(i)->GetName() );
+            }
         }
-
     }
 
 }

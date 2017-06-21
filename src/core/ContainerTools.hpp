@@ -18,7 +18,6 @@ CreateMap(const T1& v1_, const T2& v2_){
 
     std::map<typename T1::value_type, typename T2::value_type> map;
 
-
     It2 it1 = v1_.begin();
     It3 it2 = v2_.begin();
 

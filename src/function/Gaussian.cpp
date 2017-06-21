@@ -1,4 +1,5 @@
 #include <Gaussian.h>
+#include <GaussianFitter.h>
 #include <Exceptions.h>
 #include <ContainerParameter.h>
 #include <Formatter.hpp>
@@ -6,6 +7,9 @@
 #include <Rand.h>
 #include <sstream>
 #include <math.h>
+#include <ContainerTools.hpp>
+
+using ContainerTools::ToString;
 
 /////////////////////////
 // Constructory Things //
@@ -14,6 +18,8 @@
 void
 Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double>& stdDevs_, 
                      const std::string& name_){
+    fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
+    // fFitter.SetOriginalFunction(this);
     if (name_ == "")
         fName = "gaussian";
     else
@@ -25,7 +31,7 @@ Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double
     fCdfCutOff = 6; // default val
 }
 
-Gaussian::Gaussian(const std::vector<double>& means_, const std::vector<double>& stdDevs_, const std::string& name_){
+Gaussian::Gaussian(const std::vector<double>& means_, const std::vector<double>& stdDevs_, const std::string& name_) {
     Initialise(means_, stdDevs_, name_);
 }
 
@@ -70,6 +76,25 @@ Gaussian::GetStDev(size_t dimension_) const{
     }
 }
 
+void
+Gaussian::SetMeans(const std::vector<double>& means_) {
+    // std::cout << "setting means" << std::endl;
+    // for (int i = 0; i < means_.size(); ++i) {
+    //     std::cout << "means.at("<<i<<") = "<< means_.at(i) << std::endl;
+    // }
+    // std::cout << "-----" << std::endl;
+    fMeans= means_;
+    // std::cout << "New" << std::endl;
+    // for (int i = 0; i < fMeans.size(); ++i) {
+    //     std::cout << "fMeans.at("<<i<<") = "<< fMeans.at(i) << std::endl;
+    // }
+}
+
+void
+Gaussian::SetStdDevs(const std::vector<double>& stddevs_) {
+    fStdDevs= stddevs_;
+}
+
 std::vector<double>
 Gaussian::GetMeans() const {
     return fMeans;
@@ -88,8 +113,10 @@ Gaussian::SetMeansStdDevs(const std::vector<double>& means_,
     fMeans = means_;
     fStdDevs = stdDevs_;
     fNDims = means_.size();
-    fParameterManager.AddContainer(fMeans, "means");
-    fParameterManager.AddContainer(fStdDevs, "stddevs");
+    fFitter.SetMeanNames(fMeans,"means");
+    fFitter.SetStdDevNames(fStdDevs,"stddevs");
+    // fParameterManager.AddContainer(fMeans, "means");
+    // fParameterManager.AddContainer(fStdDevs, "stddevs");
 }
 
 std::vector<double>
@@ -148,6 +175,8 @@ Gaussian::Cdf(size_t dim_, double val_) const{
     if(nDevs < -1 * fCdfCutOff)
         return 0;
 
+    // std::cout <<"Does this change = dim : "<<dim_ << " " << GetMean(dim_)  << std::endl;
+    // std::cout <<"Does this change = dim : "<<dim_ << " " << GetStDev(dim_)  << std::endl;
     return gsl_cdf_gaussian_P(val_ - GetMean(dim_), GetStDev(dim_));
 }
 
@@ -178,37 +207,41 @@ Gaussian::Sample() const{
 ////////////////////////
 void
 Gaussian::RenameParameter(const std::string& old_, const std::string& new_){
-    fParameterManager.RenameParameter(old_, new_);
+    fFitter.RenameParameter(old_, new_);
 }
 
 void
 Gaussian::SetParameter(const std::string& name_, double value_){
-    fParameterManager.SetParameter(name_, value_);
+    // std::cout << "HERE" << std::endl;
+    fFitter.SetParameter(name_, value_);
 }
 
 double
 Gaussian::GetParameter(const std::string& name_) const{
-    return fParameterManager.GetParameter(name_);
+    return fFitter.GetParameter(name_);
 }
 
 void
 Gaussian::SetParameters(const ParameterDict& ps_){
-    fParameterManager.SetParameters(ps_);
+     fFitter.SetParameters(ps_);
+     // SetMeans(std::vector<double>(1,1.1));
+     // std::cout << fMeans.at(0) << std::endl;
+     // std::cout << ToString(fMeans)<< ToString(fStdDevs) << std::endl;
 }
 
 ParameterDict
 Gaussian::GetParameters() const{
-    return fParameterManager.GetParameters();
+    return fFitter.GetParameters();
 }
 
 size_t
 Gaussian::GetParameterCount() const{
-    return fParameterManager.GetParameterCount();
+    return fFitter.GetParameterCount();
 }
 
 std::set<std::string>
 Gaussian::GetParameterNames() const{
-    return fParameterManager.GetParameterNames();
+    return fFitter.GetParameterNames();
 }
 
 std::string
