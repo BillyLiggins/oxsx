@@ -54,9 +54,11 @@ class Gaussian : public PDF{
     
     std::string GetName() const;
     void SetName(const std::string&);
+    void SetMeans(const std::vector<double>& means_);
+    void SetStdDevs(const std::vector<double>& stddev_);
      
-    void SetMeansStdDevs(const std::vector<double>& means_, 
-                         const std::vector<double>& stdDevs_);
+    // void SetMeansStdDevs(const std::vector<double>& means_, 
+    //                      const std::vector<double>& stdDevs_);
  private:
     GaussianFitter fFitter;
     std::vector<double> fMeans;
@@ -71,8 +73,8 @@ class Gaussian : public PDF{
                       const std::vector<double>& stdDevs_,
                       const std::string& name_);
     
-    // // this is private, we want the dimensionality to be fixed at creation
-    // void SetMeansStdDevs(const std::vector<double>& means_, 
-    //                      const std::vector<double>& stdDevs_);
+    // this is private, we want the dimensionality to be fixed at creation
+    void SetMeansStdDevs(const std::vector<double>& means_, 
+                         const std::vector<double>& stdDevs_);
 };
 #endif

@@ -7,6 +7,9 @@
 #include <Rand.h>
 #include <sstream>
 #include <math.h>
+#include <ContainerTools.hpp>
+
+using ContainerTools::ToString;
 
 /////////////////////////
 // Constructory Things //
@@ -15,8 +18,8 @@
 void
 Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double>& stdDevs_, 
                      const std::string& name_){
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
-    fFitter.SetOriginalFunction(this);
+    fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
+    // fFitter.SetOriginalFunction(this);
     if (name_ == "")
         fName = "gaussian";
     else
@@ -29,33 +32,18 @@ Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double
 }
 
 Gaussian::Gaussian(const std::vector<double>& means_, const std::vector<double>& stdDevs_, const std::string& name_) {
-    // fFitter = new GaussianFitter();
-    // fFitter.SetOriginalFunction(this);
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
     Initialise(means_, stdDevs_, name_);
 }
 
 Gaussian::Gaussian(size_t nDims_, const std::string& name_){
-    // fFitter = new GaussianFitter();
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
-    // fFitter.SetOriginalFunction(this);
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
     Initialise(std::vector<double>(nDims_, 0), std::vector<double>(nDims_, 1), name_);
 }
 
 Gaussian::Gaussian(double mean_, double stdDev_, const std::string& name_){
-    // fFitter = new GaussianFitter();
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
-    // fFitter.SetOriginalFunction(this);
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
     Initialise(std::vector<double>(1, mean_), std::vector<double>(1, stdDev_), name_);
 }
 
 Gaussian::Gaussian(){
-    // fFitter = new GaussianFitter();
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
-    // fFitter.SetOriginalFunction(this);
-    // fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
     Initialise(std::vector<double>(1, 0), std::vector<double>(1, 1), "");
 }
 
@@ -86,6 +74,25 @@ Gaussian::GetStDev(size_t dimension_) const{
     catch(const std::out_of_range& e_){
         throw NotFoundError("Requested Gaussian stdDev beyond function dimensionality!");
     }
+}
+
+void
+Gaussian::SetMeans(const std::vector<double>& means_) {
+    // std::cout << "setting means" << std::endl;
+    // for (int i = 0; i < means_.size(); ++i) {
+    //     std::cout << "means.at("<<i<<") = "<< means_.at(i) << std::endl;
+    // }
+    // std::cout << "-----" << std::endl;
+    fMeans= means_;
+    // std::cout << "New" << std::endl;
+    // for (int i = 0; i < fMeans.size(); ++i) {
+    //     std::cout << "fMeans.at("<<i<<") = "<< fMeans.at(i) << std::endl;
+    // }
+}
+
+void
+Gaussian::SetStdDevs(const std::vector<double>& stddevs_) {
+    fStdDevs= stddevs_;
 }
 
 std::vector<double>
@@ -168,6 +175,8 @@ Gaussian::Cdf(size_t dim_, double val_) const{
     if(nDevs < -1 * fCdfCutOff)
         return 0;
 
+    // std::cout <<"Does this change = dim : "<<dim_ << " " << GetMean(dim_)  << std::endl;
+    // std::cout <<"Does this change = dim : "<<dim_ << " " << GetStDev(dim_)  << std::endl;
     return gsl_cdf_gaussian_P(val_ - GetMean(dim_), GetStDev(dim_));
 }
 
@@ -203,6 +212,7 @@ Gaussian::RenameParameter(const std::string& old_, const std::string& new_){
 
 void
 Gaussian::SetParameter(const std::string& name_, double value_){
+    // std::cout << "HERE" << std::endl;
     fFitter.SetParameter(name_, value_);
 }
 
@@ -214,6 +224,9 @@ Gaussian::GetParameter(const std::string& name_) const{
 void
 Gaussian::SetParameters(const ParameterDict& ps_){
      fFitter.SetParameters(ps_);
+     // SetMeans(std::vector<double>(1,1.1));
+     // std::cout << fMeans.at(0) << std::endl;
+     // std::cout << ToString(fMeans)<< ToString(fStdDevs) << std::endl;
 }
 
 ParameterDict

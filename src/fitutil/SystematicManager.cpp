@@ -18,19 +18,22 @@ SystematicManager::Construct(){
 
     //This loop should construct all fGroups.
     for (std::map<std::string,std::vector<Systematic*> >::const_iterator group =fGroups.begin(); group != fGroups.end(); ++group ) {
+        std::cout << "should  be seen"  << std::endl;
         SparseMatrix resp = fGroups[group->first].at(0) -> GetResponse();
-        for(size_t i = 1; i < group->second.size(); i++)
+        for(size_t i = 1; i < group->second.size(); i++){
+            std::cout << "shouldn't be seen"  << std::endl;
             resp *= fGroups[group->first].at(i) -> GetResponse();
+        }
         fTotalReponses[group->first]=resp;
     }
 }
-
 
 const SparseMatrix&
 SystematicManager::GetTotalResponse(const std::string& groupName_) const{
     //should you construct?
     try{
-        return fTotalReponses.find(groupName_)->second;
+        // return fTotalReponses.find(groupName_)->second;
+        return fTotalReponses.at(groupName_);
     }
     catch(const std::out_of_range& e_){
         throw NotFoundError(Formatter()<<
@@ -83,6 +86,8 @@ SystematicManager::AddDist(const BinnedED& pdf, const std::vector<std::string>& 
 
 void
 SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) const {
+    std::cout << "Before" << std::endl;
+    std::cout << fWorkingEDs_.at(0).GetBinContent(5) << std::endl;
     for(size_t j = 0; j < fWorkingEDs_.size(); j++){
         const std::string name = fWorkingEDs_.at(j).GetName();
 
@@ -90,24 +95,26 @@ SystematicManager::DistortEDs(std::vector<BinnedED>& fWorkingEDs_) const {
         if ( fGroups.find("default") != fGroups.end() )
             fWorkingEDs_[j].SetBinContents(GetTotalResponse("default").operator()(fWorkingEDs_.at(j).GetBinContents()));
 
-        //
         if(fEDGroups.find(name) == fEDGroups.end())
             continue;
             
         //Apply everything else.
-        // for (int i = 0; i < fEDGroups[name].size(); ++i) {
         for (int i = 0; i < fEDGroups.at(name).size(); ++i) {
             //Check that the group has systematics init. 
             std::string groupName = fEDGroups.at(name).at(i);
+            if (groupName == "default")
+                continue;
             if (!fGroups.at( groupName ).size())
                 throw LogicError(Formatter()<<"SystematicManager:: ED "<<
                         name
                         <<" has a systematic group of zero size acting on it");
 
-            // fWorkingEDs_[j].SetBinContents(GetTotalResponse(fEDGroups.at(groupName).at(i)).operator()(fWorkingEDs_.at(j).GetBinContents()));
-            fWorkingEDs_[j].SetBinContents(GetTotalResponse(fEDGroups.at(name).at(i)).operator()(fWorkingEDs_.at(j).GetBinContents()));
+            // std::cout << "for name : "<<name << " applying group : "<<groupName << std::endl;
+            fWorkingEDs_[j].SetBinContents(GetTotalResponse(groupName).operator()(fWorkingEDs_.at(j).GetBinContents()));
         }
     }
+    std::cout << "After" << std::endl;
+    std::cout << fWorkingEDs_.at(0).GetBinContent(5) << std::endl;
 }
 
 

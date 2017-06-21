@@ -32,6 +32,8 @@ BinnedEDManager::BinProbability(size_t bin_) const{
     try{
         for(size_t i = 0; i < fWorkingPdfs.size(); i++){
             sum += fNormalisations.at(i) * fWorkingPdfs.at(i).GetBinContent(bin_);
+            // if(i==0 && bin_==100)
+            //     std::cout << fWorkingPdfs.at(0).GetBinContent(bin_) << std::endl;
     
         }
     }
