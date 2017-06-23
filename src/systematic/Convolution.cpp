@@ -75,7 +75,6 @@ Convolution::Construct(){
     fResponse.SetComponents(nonZeroRowIndices, nonZeroColIndices, values);
 }
 
-
 void
 Convolution::CacheCompatibleBins(){
     fCompatibleBins.resize(fAxes.GetNBins());

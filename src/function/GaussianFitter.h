@@ -12,13 +12,27 @@ class GaussianFitter{
 public:
     GaussianFitter(){
         fOrignalFunc=NULL;
+        fMeansPointer=NULL;
+        fStdDevsPointer=NULL;
     }
-    // GaussianFitter(Gaussian * func_);
+
+    GaussianFitter(const GaussianFitter& obj){
+        fOrignalFunc = obj.fOrignalFunc;
+        fMeansPointer= obj.fMeansPointer;
+        fStdDevsPointer = obj.fStdDevsPointer;
+        fMeans = obj.fMeans;
+        fStdDevs = obj.fStdDevs;
+    }
+
     // ~GaussianFitter(){
     //     delete fOrignalFunc;
+    //     delete fMeansPointer;
+    //     delete fStdDevsPointer;
     // }
 
     void SetOriginalFunction(Gaussian* func_);
+    void SetMeanPointer(std::vector<double>* means);
+    void SetStdDevsPointer(std::vector<double>* stddevs);
     void SetMeanNames(const std::vector<double>& means_,const std::string& baseName_);
     void SetStdDevNames(const std::vector<double>& stdDevs_,const std::string& baseName_);
 
@@ -34,6 +48,8 @@ public:
 
 private:
     Gaussian* fOrignalFunc;
+    std::vector<double>* fMeansPointer;
+    std::vector<double>* fStdDevsPointer;
     std::vector<std::string> fMeans;
     std::vector<std::string> fStdDevs;
 };
