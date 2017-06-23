@@ -4,15 +4,21 @@
 #include <algorithm>
 #include <functional>
 
+#include <Gaussian.h>
+
 //////////////////////////////
 // CONSTRUCTORS/DESTRUCTORS //
 //////////////////////////////
 
 JumpPDF::JumpPDF(const std::string& name_, PDF* f_){
   fName = name_;
-  if(f_)
+  std::cout << "NAME = " << name_ << std::endl;
+  if(f_){
+    // when you copy do you take the parameters?
     fPDF = static_cast<PDF*>(f_->Clone());
-  
+    std::cout << "from JumpPDF = "<< static_cast<Gaussian*>(f_)->GetMean(0) << std::endl;
+
+  } 
   else
     fPDF = NULL;  
 }

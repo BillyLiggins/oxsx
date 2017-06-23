@@ -46,6 +46,7 @@ BinnedNLLH::Evaluate(){
         it != fConstraints.end(); ++it)
         nLogLH += it->second.Evaluate(fComponentManager.GetParameter(it->first));
    
+    std::cout << "Likelihood = "<< nLogLH << std::endl;
     return nLogLH;
 }
 
@@ -226,6 +227,10 @@ BinnedNLLH::RegisterFitComponents(){
 void
 BinnedNLLH::SetParameters(const ParameterDict& params_){
     try{
+        for (ParameterDict::const_iterator i = params_.begin(); i != params_.end(); ++i) {
+            std::cout <<"Setting "<< i->first<< " = " << i->second  << std::endl;
+        }
+        
         fComponentManager.SetParameters(params_);
     }
     catch(const ParameterError& e_){

@@ -25,9 +25,9 @@ Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double
     else
         fName = name_;
     SetMeansStdDevs(means_, stdDevs_);
-    fNDims   = means_.size() ;
-    fMeans   = means_;
-    fStdDevs = stdDevs_;
+    // fNDims   = means_.size() ;
+    // fMeans   = means_;
+    // fStdDevs = stdDevs_;
     fCdfCutOff = 6; // default val
 }
 
@@ -59,6 +59,7 @@ Gaussian::Clone() const{
 double 
 Gaussian::GetMean(size_t dimension_) const{
     try{
+        // return fMeans.at(dimension_);
         return fMeans.at(dimension_);
     }
     catch(const std::out_of_range& e_){
@@ -77,22 +78,23 @@ Gaussian::GetStDev(size_t dimension_) const{
 }
 
 void
+Gaussian::SetMean(const size_t& dim_ , const double& value_) {
+    std::cout << "before setting mean : " << value_ << std::endl;
+    fMeans[dim_]= value_;
+    std::cout << "after setting mean : " << GetMean(0) << std::endl;
+    std::cout << "name = "<< GetName()<<" "<< ToString(fMeans) << ToString(fStdDevs) << std::endl;
+}
+
+void
 Gaussian::SetMeans(const std::vector<double>& means_) {
-    // std::cout << "setting means" << std::endl;
-    // for (int i = 0; i < means_.size(); ++i) {
-    //     std::cout << "means.at("<<i<<") = "<< means_.at(i) << std::endl;
-    // }
-    // std::cout << "-----" << std::endl;
-    fMeans= means_;
-    // std::cout << "New" << std::endl;
-    // for (int i = 0; i < fMeans.size(); ++i) {
-    //     std::cout << "fMeans.at("<<i<<") = "<< fMeans.at(i) << std::endl;
-    // }
+    std::cout << "Before setting mean : "<< GetName() << " " << means_.at(0) << std::endl;
+    fMeans = means_;
+    std::cout << "After setting mean : "<< GetName() << " " << GetMean(0) << std::endl;
 }
 
 void
 Gaussian::SetStdDevs(const std::vector<double>& stddevs_) {
-    fStdDevs= stddevs_;
+    fStdDevs = stddevs_;
 }
 
 std::vector<double>
@@ -112,6 +114,8 @@ Gaussian::SetMeansStdDevs(const std::vector<double>& means_,
 
     fMeans = means_;
     fStdDevs = stdDevs_;
+    fFitter.SetMeanPointer( &fMeans );
+    fFitter.SetStdDevsPointer( &fStdDevs );
     fNDims = means_.size();
     fFitter.SetMeanNames(fMeans,"means");
     fFitter.SetStdDevNames(fStdDevs,"stddevs");
@@ -175,8 +179,6 @@ Gaussian::Cdf(size_t dim_, double val_) const{
     if(nDevs < -1 * fCdfCutOff)
         return 0;
 
-    // std::cout <<"Does this change = dim : "<<dim_ << " " << GetMean(dim_)  << std::endl;
-    // std::cout <<"Does this change = dim : "<<dim_ << " " << GetStDev(dim_)  << std::endl;
     return gsl_cdf_gaussian_P(val_ - GetMean(dim_), GetStDev(dim_));
 }
 
@@ -189,6 +191,8 @@ Gaussian::Integral(const std::vector<double>& mins_, const std::vector<double>& 
     for(size_t i = 0; i < mins_.size(); i++)
         integral *= ( Cdf(i, maxs_[i]) - Cdf(i, mins_[i]));
   
+    // if( GetMean(0) != 0)
+    //     std::cout << GetMean(0) << std::endl;
     return integral;  
 }
 
@@ -212,7 +216,6 @@ Gaussian::RenameParameter(const std::string& old_, const std::string& new_){
 
 void
 Gaussian::SetParameter(const std::string& name_, double value_){
-    // std::cout << "HERE" << std::endl;
     fFitter.SetParameter(name_, value_);
 }
 
@@ -224,9 +227,9 @@ Gaussian::GetParameter(const std::string& name_) const{
 void
 Gaussian::SetParameters(const ParameterDict& ps_){
      fFitter.SetParameters(ps_);
-     // SetMeans(std::vector<double>(1,1.1));
-     // std::cout << fMeans.at(0) << std::endl;
-     // std::cout << ToString(fMeans)<< ToString(fStdDevs) << std::endl;
+     // std::cout << "ps_[gaus_a_1] "<<ps_.at("gaus_a_1") << std::endl;
+     std::cout << "name = "<< GetName()<<" "<< ToString(fMeans) << ToString(fStdDevs) << std::endl;
+     // std::cout << "name = "<< GetName()<<" "<< fMeans.at(0)<<" "<< fStdDevs.at(0)<< std::endl;
 }
 
 ParameterDict
