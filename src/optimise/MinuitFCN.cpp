@@ -18,7 +18,6 @@ MinuitFCN::operator()(const std::vector<double>& paramVals_) const {
     return pTestStatistic -> Evaluate();
 }
 
-
 MinuitFCN&
 MinuitFCN::operator=(const MinuitFCN& other_){
     if(this == &other_)

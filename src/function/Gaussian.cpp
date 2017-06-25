@@ -15,36 +15,50 @@ using ContainerTools::ToString;
 // Constructory Things //
 /////////////////////////
 
+// Constructory things
+Gaussian::Gaussian() : fFitter(this){
+    Initialise(std::vector<double>(1, 0), std::vector<double>(1, 1), "");
+}
+
+Gaussian::Gaussian(size_t nDims_, const std::string& name_): fFitter(this){
+    Initialise(std::vector<double>(nDims_, 0), std::vector<double>(nDims_, 1), name_);
+}// means = 0, stdDevs = 1
+
+Gaussian::Gaussian(double mean_, double stdDev_, const std::string& name_ ): fFitter(this){
+    Initialise(std::vector<double>(1, mean_), std::vector<double>(1, stdDev_), name_);
+}
+
+Gaussian::Gaussian(const std::vector<double>& mean_, 
+         const std::vector<double>& stdDev_, const std::string& name_ ): fFitter(this){
+    Initialise(mean_, stdDev_, name_);
+}
+
+Gaussian::Gaussian(const Gaussian& copy_): fFitter(this){
+    fMeans = copy_.fMeans;
+    fStdDevs = copy_.fStdDevs;
+    fCdfCutOff = copy_.fCdfCutOff;
+    fNDims = copy_.fNDims;
+    // fName = copy_.fName;
+    fName = std::string(copy_.fName+"_copy");
+    // THE ORDER HE IS ALL IMPORTANT INIT() AND fFitter = copy_.fFitter MUST BE CALL AT THE END!!!!!!!!!!
+    // SORT THIS OUT MUST BE A BETTER WAY!!!!
+    // fFitter = GaussianFitter(copy_.fFitter);
+    fFitter = copy_.fFitter;
+    fFitter.init();
+}
 void
 Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double>& stdDevs_, 
                      const std::string& name_){
-    fFitter.SetOriginalFunction( dynamic_cast<Gaussian*>(this));
-    // fFitter.SetOriginalFunction(this);
     if (name_ == "")
         fName = "gaussian";
     else
         fName = name_;
     SetMeansStdDevs(means_, stdDevs_);
-    // fNDims   = means_.size() ;
-    // fMeans   = means_;
-    // fStdDevs = stdDevs_;
+    fNDims   = means_.size() ;
+    fMeans   = means_;
+    fStdDevs = stdDevs_;
+    fFitter.init();
     fCdfCutOff = 6; // default val
-}
-
-Gaussian::Gaussian(const std::vector<double>& means_, const std::vector<double>& stdDevs_, const std::string& name_) {
-    Initialise(means_, stdDevs_, name_);
-}
-
-Gaussian::Gaussian(size_t nDims_, const std::string& name_){
-    Initialise(std::vector<double>(nDims_, 0), std::vector<double>(nDims_, 1), name_);
-}
-
-Gaussian::Gaussian(double mean_, double stdDev_, const std::string& name_){
-    Initialise(std::vector<double>(1, mean_), std::vector<double>(1, stdDev_), name_);
-}
-
-Gaussian::Gaussian(){
-    Initialise(std::vector<double>(1, 0), std::vector<double>(1, 1), "");
 }
 
 Function* 
@@ -79,17 +93,12 @@ Gaussian::GetStDev(size_t dimension_) const{
 
 void
 Gaussian::SetMean(const size_t& dim_ , const double& value_) {
-    std::cout << "before setting mean : " << value_ << std::endl;
     fMeans[dim_]= value_;
-    std::cout << "after setting mean : " << GetMean(0) << std::endl;
-    std::cout << "name = "<< GetName()<<" "<< ToString(fMeans) << ToString(fStdDevs) << std::endl;
 }
 
 void
 Gaussian::SetMeans(const std::vector<double>& means_) {
-    std::cout << "Before setting mean : "<< GetName() << " " << means_.at(0) << std::endl;
     fMeans = means_;
-    std::cout << "After setting mean : "<< GetName() << " " << GetMean(0) << std::endl;
 }
 
 void
@@ -114,11 +123,9 @@ Gaussian::SetMeansStdDevs(const std::vector<double>& means_,
 
     fMeans = means_;
     fStdDevs = stdDevs_;
-    fFitter.SetMeanPointer( &fMeans );
-    fFitter.SetStdDevsPointer( &fStdDevs );
     fNDims = means_.size();
-    fFitter.SetMeanNames(fMeans,"means");
-    fFitter.SetStdDevNames(fStdDevs,"stddevs");
+    // fFitter.SetMeanNames(fMeans,"means");
+    // fFitter.SetStdDevNames(fStdDevs,"stddevs");
     // fParameterManager.AddContainer(fMeans, "means");
     // fParameterManager.AddContainer(fStdDevs, "stddevs");
 }
@@ -191,8 +198,6 @@ Gaussian::Integral(const std::vector<double>& mins_, const std::vector<double>& 
     for(size_t i = 0; i < mins_.size(); i++)
         integral *= ( Cdf(i, maxs_[i]) - Cdf(i, mins_[i]));
   
-    // if( GetMean(0) != 0)
-    //     std::cout << GetMean(0) << std::endl;
     return integral;  
 }
 
@@ -227,9 +232,6 @@ Gaussian::GetParameter(const std::string& name_) const{
 void
 Gaussian::SetParameters(const ParameterDict& ps_){
      fFitter.SetParameters(ps_);
-     // std::cout << "ps_[gaus_a_1] "<<ps_.at("gaus_a_1") << std::endl;
-     std::cout << "name = "<< GetName()<<" "<< ToString(fMeans) << ToString(fStdDevs) << std::endl;
-     // std::cout << "name = "<< GetName()<<" "<< fMeans.at(0)<<" "<< fStdDevs.at(0)<< std::endl;
 }
 
 ParameterDict

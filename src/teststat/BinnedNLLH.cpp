@@ -46,7 +46,6 @@ BinnedNLLH::Evaluate(){
         it != fConstraints.end(); ++it)
         nLogLH += it->second.Evaluate(fComponentManager.GetParameter(it->first));
    
-    std::cout << "Likelihood = "<< nLogLH << std::endl;
     return nLogLH;
 }
 
@@ -195,42 +194,23 @@ BinnedNLLH::RegisterFitComponents(){
     fComponentManager.Clear();
     fComponentManager.AddComponent(&fPdfManager);
     
-    //Because the limits are set by name you only need to make sure you add the systematic once.
+    //Because the limits are set by name they can be added in any order.
     const std::map<std::string, std::vector<Systematic*> > sys_ = fSystematicManager.GetSystematicsGroup();
     std::vector<std::string> alreadyAdded;
     for (std::map<std::string, std::vector<Systematic*> >::const_iterator group_ = sys_.begin(); group_ !=sys_.end(); ++group_) {
-            // std::cout <<"group = "<<group_->first<< std::endl;
         for (int i = 0; i < group_->second.size(); ++i) {
-            // std::cout <<i<<" "<< group_->second.at(i)->GetName() << std::endl;
             if( std::find( alreadyAdded.begin() , alreadyAdded.end() , group_->second.at(i)->GetName() ) == alreadyAdded.end() ){
-                std::cout <<"Adding Sys =  "<< group_->second.at(i)->GetName() << std::endl;
-                //The conv systematic doesn't have any parameters.
-                // it is a fit component but doens't have parameters.
                 fComponentManager.AddComponent( group_->second.at(i) );
                 alreadyAdded.push_back( group_->second.at(i)->GetName() );
             }
-        }
-    }
-
-    // std::cout << "----------" << std::endl;
-    // std::cout << fComponentManager.GetTotalParameterCount() << std::endl;
-    // for (ParameterDict::const_iterator group_ = fComponentManager.GetParameters().begin(); group_ != fComponentManager.GetParameters().end(); ++group_) {
-    //             std::cout <<"Parameter  = "<< group_->first << " "<< group_->second << std::endl;
-    // }
-    // std::set<std::string> paraNames = fComponentManager.GetParameterNames();
-    // for (std::set<std::string>::const_iterator it = paraNames.begin(); it !=  paraNames.end(); it++) {
-    //     std::cout << *it;
-    // }
+        }//End odf group
+    }//End of groups
 }
 
 
 void
 BinnedNLLH::SetParameters(const ParameterDict& params_){
     try{
-        for (ParameterDict::const_iterator i = params_.begin(); i != params_.end(); ++i) {
-            std::cout <<"Setting "<< i->first<< " = " << i->second  << std::endl;
-        }
-        
         fComponentManager.SetParameters(params_);
     }
     catch(const ParameterError& e_){
