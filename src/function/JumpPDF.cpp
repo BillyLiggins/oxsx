@@ -4,21 +4,15 @@
 #include <algorithm>
 #include <functional>
 
-#include <Gaussian.h>
-
 //////////////////////////////
 // CONSTRUCTORS/DESTRUCTORS //
 //////////////////////////////
 
 JumpPDF::JumpPDF(const std::string& name_, PDF* f_){
   fName = name_;
-  std::cout << "NAME = " << name_ << std::endl;
-  if(f_){
-    // when you copy do you take the parameters?
+  if(f_)
     fPDF = static_cast<PDF*>(f_->Clone());
-    std::cout << "from JumpPDF = "<< static_cast<Gaussian*>(f_)->GetMean(0) << std::endl;
-
-  } 
+  
   else
     fPDF = NULL;  
 }
@@ -100,7 +94,7 @@ JumpPDF::Integral(const std::vector<double>& mins_,
     throw NULLPointerAccessError("JumpPDF::Integral",
                                  "Have you set the function?");
   
-  return fPDF->Integral( Diff(mins_, x2_) , Diff(maxs_, x2_) );
+  return fPDF->Integral(Diff(maxs_, x2_), Diff(mins_, x2_));
 }
                                       
 
@@ -170,7 +164,7 @@ JumpPDF::GetParameterCount() const{
     return fPDF->GetParameterCount();
 }
 
-std::set<std::string>
+std::vector<std::string>
 JumpPDF::GetParameterNames() const{
     if(!fPDF)
          throw NULLPointerAccessError("JumpPDF::Probability",
