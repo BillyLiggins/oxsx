@@ -95,6 +95,11 @@ Gaussian::SetMean(const size_t& dim_ , const double& value_) {
 }
 
 void
+Gaussian::SetStdDev(const size_t& dim_ , const double& value_) {
+    fStdDevs[dim_]= value_;
+}
+
+void
 Gaussian::SetMeans(const std::vector<double>& means_) {
     fMeans = means_;
 }
@@ -122,10 +127,6 @@ Gaussian::SetMeansStdDevs(const std::vector<double>& means_,
     fMeans = means_;
     fStdDevs = stdDevs_;
     fNDims = means_.size();
-    // fFitter.SetMeanNames(fMeans,"means");
-    // fFitter.SetStdDevNames(fStdDevs,"stddevs");
-    // fParameterManager.AddContainer(fMeans, "means");
-    // fParameterManager.AddContainer(fStdDevs, "stddevs");
 }
 
 std::vector<double>
