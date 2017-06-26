@@ -38,12 +38,10 @@ Gaussian::Gaussian(const Gaussian& copy_): fFitter(this){
     fStdDevs = copy_.fStdDevs;
     fCdfCutOff = copy_.fCdfCutOff;
     fNDims = copy_.fNDims;
-    // fName = copy_.fName;
     fName = std::string(copy_.fName+"_copy");
-    // THE ORDER HE IS ALL IMPORTANT INIT() AND fFitter = copy_.fFitter MUST BE CALL AT THE END!!!!!!!!!!
+    // THE ORDER HERE IS ALL IMPORTANT: INIT() AND GaussianFitter() MUST BE CALL AFTER THE MEANS AND STDDEVS ARE MADE!!!!!!!!!!
     // SORT THIS OUT MUST BE A BETTER WAY!!!!
-    // fFitter = GaussianFitter(copy_.fFitter);
-    fFitter = copy_.fFitter;
+    fFitter = GaussianFitter(copy_.fFitter);
     fFitter.init();
 }
 void
