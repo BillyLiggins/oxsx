@@ -11,7 +11,6 @@ class Gaussian;
 class GaussianFitter{
 public:
 
-    // GaussianFitter(Gaussian* gaus);
     GaussianFitter(Gaussian* gaus,const size_t& nDims);
 
     void   SetParameter(const std::string& name_, double value);

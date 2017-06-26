@@ -40,7 +40,6 @@ Gaussian::Gaussian(const Gaussian& copy_): fFitter(this,copy_.fNDims){
     fCdfCutOff = copy_.fCdfCutOff;
     fNDims = copy_.fNDims;
     fName = std::string(copy_.fName+"_copy");
-    std::cout << fName <<" "<< copy_.fNDims << std::endl;
 }
 
 Gaussian

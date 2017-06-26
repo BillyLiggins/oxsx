@@ -7,7 +7,6 @@
 #include <Exceptions.h>
 #include <algorithm>
 
-// GaussianFitter::GaussianFitter(Gaussian* gaus){
 GaussianFitter::GaussianFitter(Gaussian* gaus, const size_t& nDims_){
     fOrignalFunc = gaus; 
     size_t nMeans = gaus->GetNMeans();
