@@ -7,23 +7,17 @@
 #include <Exceptions.h>
 #include <algorithm>
 
-void 
-GaussianFitter::SetMeanNames(const std::string& baseName_){
+// GaussianFitter::GaussianFitter(Gaussian* gaus){
+GaussianFitter::GaussianFitter(Gaussian* gaus, const size_t& nDims_){
+    fOrignalFunc = gaus; 
+    size_t nMeans = gaus->GetNMeans();
     std::stringstream ss;
-    std::vector<double> means = fOrignalFunc->GetMeans();
-    for (int i = 0; i < means.size(); ++i) {
-        ss << baseName_<< "_" << i;
-        fMeans.push_back(ss.str());
+    for (int i = 0; i <nDims_; ++i) {
+        ss << "means" << "_" << i;
+        fMeansNames.push_back(ss.str());
         ss.str("");
-    }
-}
-
-void 
-GaussianFitter::SetStdDevNames(const std::string& baseName_){
-    std::stringstream ss;
-    for (int i = 0; i < fOrignalFunc->GetStdDevs().size(); ++i) {
-        ss << baseName_<< "_" << i;
-        fStdDevs.push_back(ss.str());
+        ss << "stddevs" << "_" << i;
+        fStdDevsNames.push_back(ss.str());
         ss.str("");
     }
 }
@@ -31,11 +25,11 @@ GaussianFitter::SetStdDevNames(const std::string& baseName_){
 void
 GaussianFitter::RenameParameter(const std::string& old_, const std::string& new_){
     std::vector<std::string>::iterator it;
-    it=find(fMeans.begin(),fMeans.end(),old_);
+    it=find(fMeansNames.begin(),fMeansNames.end(),old_);
 
-    if(it==fMeans.end()){
-        it=find(fStdDevs.begin(),fStdDevs.end(), old_);
-        if(it==fStdDevs.end())
+    if(it==fMeansNames.end()){
+        it=find(fStdDevsNames.begin(),fStdDevsNames.end(), old_);
+        if(it==fStdDevsNames.end())
             throw NotFoundError(Formatter()<<"GaussianFitter:: When renaming the original name wasn't found : "<<
                     old_);
         *it=new_;
@@ -48,20 +42,20 @@ void
 GaussianFitter::SetParameter(const std::string& name_, double value_){
     std::vector<std::string>::iterator it;
 
-    it=find(fMeans.begin(),fMeans.end(), name_);
+    it=find(fMeansNames.begin(),fMeansNames.end(), name_);
 
-    if(it==fMeans.end()){
+    if(it==fMeansNames.end()){
 
-        it=find(fStdDevs.begin(),fStdDevs.end(), name_);
+        it=find(fStdDevsNames.begin(),fStdDevsNames.end(), name_);
 
-        if(it==fStdDevs.end())
+        if(it==fStdDevsNames.end())
             //This should use compare keys.
             return;
 
-        fOrignalFunc->SetStdDev(it-fStdDevs.begin(),value_);
+        fOrignalFunc->SetStdDev(it-fStdDevsNames.begin(),value_);
         return;
     }
-    fOrignalFunc->SetMean(it-fMeans.begin(),value_);
+    fOrignalFunc->SetMean(it-fMeansNames.begin(),value_);
 }
 
 double
@@ -70,19 +64,19 @@ GaussianFitter::GetParameter(const std::string& name_) const{
     std::vector<double> stddevs= fOrignalFunc->GetStdDevs();
     std::vector<std::string>::const_iterator it;
 
-    it=find(fMeans.begin(),fMeans.end(), name_);
+    it=find(fMeansNames.begin(),fMeansNames.end(), name_);
 
-    if(it==fMeans.end()){
-        it=find(fStdDevs.begin(),fStdDevs.end(), name_);
+    if(it==fMeansNames.end()){
+        it=find(fStdDevsNames.begin(),fStdDevsNames.end(), name_);
 
-        if(it==fStdDevs.end())
-            throw NotFoundError("GaussianFitter:: idiot");
+        if(it==fStdDevsNames.end())
+            throw NotFoundError(Formatter()<<"GaussianFitter:: Parameter : "<<
+                                name_<<
+                                " was not known to the GaussianFitter.");
 
-        return stddevs.at(it-fStdDevs.end());
-
+        return stddevs.at(it-fStdDevsNames.end());
     }
-    return means.at(it-fMeans.end());
-
+    return means.at(it-fMeansNames.end());
 }
 
 void
@@ -103,28 +97,25 @@ GaussianFitter::GetParameters() const{
     values.insert( values.end(), stddevs.begin(), stddevs.end() );
 
     std::vector<std::string> names;
-    names.reserve( fMeans.size() + fStdDevs.size() ); // preallocate memory
-    names.insert( names.end(), fMeans.begin(), fMeans.end() );
-    names.insert( names.end(), fStdDevs.begin(), fStdDevs.end() );
+    names.reserve( fMeansNames.size() + fStdDevsNames.size() ); // preallocate memory
+    names.insert( names.end(), fMeansNames.begin(), fMeansNames.end() );
+    names.insert( names.end(), fStdDevsNames.begin(), fStdDevsNames.end() );
 
     return ContainerTools::CreateMap(names,values);
 }
 
 size_t
 GaussianFitter::GetParameterCount() const{
-    return fMeans.size()+fStdDevs.size();
+    return fMeansNames.size()+fStdDevsNames.size();
 }
 
 std::set<std::string>
 GaussianFitter::GetParameterNames() const{
     std::set<std::string> names;
-    for (int i = 0; i < fMeans.size(); ++i) {
-        names.insert(fMeans.at(i));
-        names.insert(fStdDevs.at(i));
+    for (int i = 0; i < fMeansNames.size(); ++i) {
+        names.insert(fMeansNames.at(i));
+        names.insert(fStdDevsNames.at(i));
     }
-    // for (int i = 0; i <fStdDevs.size(); ++i) {
-    //     names.insert(fStdDevs.at(i));
-    // }
 
     return names;
 }

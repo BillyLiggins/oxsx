@@ -8,19 +8,16 @@
 // class GaussianFitter;
 class Gaussian : public PDF{
  public:
-     // Constructory things
-     Gaussian() ;
-     Gaussian(size_t nDims_, const std::string& name_ = "");
-     Gaussian(double mean_, double stdDev_, const std::string& name_ = "");
-     Gaussian(const std::vector<double>& mean_, 
-             const std::vector<double>& stdDev_, const std::string& name_ = "");
+    // Constructory things
+    Gaussian() ;
+    Gaussian(size_t nDims_, const std::string& name_ = "");
+    Gaussian(double mean_, double stdDev_, const std::string& name_ = "");
+    Gaussian(const std::vector<double>& mean_, 
+            const std::vector<double>& stdDev_, const std::string& name_ = "");
 
-     Gaussian(const Gaussian& copy_);
+    Gaussian(const Gaussian& copy_);
 
-     Gaussian operator=(const Gaussian& other_)
-     {
-         return Gaussian(*this);
-     }
+    Gaussian operator=(const Gaussian& other_);
 
     virtual   Function* Clone() const;
 
@@ -59,8 +56,10 @@ class Gaussian : public PDF{
      
     void SetMean(const size_t& dim_ , const double& value_);
     void SetStdDev(const size_t& dim_ , const double& value_);
+
+    size_t GetNMeans();
+    size_t GetNStdDevs();
  private:
-    GaussianFitter fFitter;
     std::vector<double> fMeans;
     std::vector<double> fStdDevs;
     
@@ -76,5 +75,6 @@ class Gaussian : public PDF{
     // this is private, we want the dimensionality to be fixed at creation
     void SetMeansStdDevs(const std::vector<double>& means_, 
                          const std::vector<double>& stdDevs_);
+    GaussianFitter fFitter;
 };
 #endif

@@ -16,34 +16,44 @@ using ContainerTools::ToString;
 /////////////////////////
 
 // Constructory things
-Gaussian::Gaussian() : fFitter(this){
+Gaussian::Gaussian() : fFitter(this,1){
     Initialise(std::vector<double>(1, 0), std::vector<double>(1, 1), "");
 }
 
-Gaussian::Gaussian(size_t nDims_, const std::string& name_): fFitter(this){
+Gaussian::Gaussian(size_t nDims_, const std::string& name_): fFitter(this,nDims_){
     Initialise(std::vector<double>(nDims_, 0), std::vector<double>(nDims_, 1), name_);
 }// means = 0, stdDevs = 1
 
-Gaussian::Gaussian(double mean_, double stdDev_, const std::string& name_ ): fFitter(this){
+Gaussian::Gaussian(double mean_, double stdDev_, const std::string& name_ ): fFitter(this,1){
     Initialise(std::vector<double>(1, mean_), std::vector<double>(1, stdDev_), name_);
 }
 
 Gaussian::Gaussian(const std::vector<double>& mean_, 
-         const std::vector<double>& stdDev_, const std::string& name_ ): fFitter(this){
+                   const std::vector<double>& stdDev_,
+                   const std::string& name_ ): fFitter(this,mean_.size()){
     Initialise(mean_, stdDev_, name_);
 }
 
-Gaussian::Gaussian(const Gaussian& copy_): fFitter(this){
+Gaussian::Gaussian(const Gaussian& copy_): fFitter(this,copy_.fNDims){
     fMeans = copy_.fMeans;
     fStdDevs = copy_.fStdDevs;
     fCdfCutOff = copy_.fCdfCutOff;
     fNDims = copy_.fNDims;
     fName = std::string(copy_.fName+"_copy");
-    // THE ORDER HERE IS ALL IMPORTANT: INIT() AND GaussianFitter() MUST BE CALL AFTER THE MEANS AND STDDEVS ARE MADE!!!!!!!!!!
-    // SORT THIS OUT MUST BE A BETTER WAY!!!!
-    fFitter = GaussianFitter(copy_.fFitter);
-    fFitter.init();
+    std::cout << fName <<" "<< copy_.fNDims << std::endl;
 }
+
+Gaussian
+Gaussian::operator=(const Gaussian& copy_){
+    fMeans = copy_.fMeans;
+    fStdDevs = copy_.fStdDevs;
+    fCdfCutOff = copy_.fCdfCutOff;
+    fNDims = copy_.fNDims;
+    fName = std::string(copy_.fName+"_copy");
+    fFitter = GaussianFitter(this,fNDims);
+    return *this;
+}
+
 void
 Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double>& stdDevs_, 
                      const std::string& name_){
@@ -55,7 +65,6 @@ Gaussian::Initialise(const std::vector<double>& means_, const std::vector<double
     fNDims   = means_.size() ;
     fMeans   = means_;
     fStdDevs = stdDevs_;
-    fFitter.init();
     fCdfCutOff = 6; // default val
 }
 
@@ -256,4 +265,14 @@ Gaussian::GetName() const{
 void
 Gaussian::SetName(const std::string& name_){
     fName = name_;
+}
+
+size_t
+Gaussian::GetNMeans(){
+    return fMeans.size();
+}
+
+size_t
+Gaussian::GetNStdDevs(){
+    return fStdDevs.size();
 }

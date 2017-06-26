@@ -11,28 +11,8 @@ class Gaussian;
 class GaussianFitter{
 public:
 
-    GaussianFitter(Gaussian* gaus){
-        fOrignalFunc = gaus; 
-    }
-
-    GaussianFitter(const GaussianFitter& obj){
-        fOrignalFunc = obj.fOrignalFunc;
-        fMeans = obj.fMeans;
-        fStdDevs = obj.fStdDevs;
-    }
-
-    GaussianFitter operator=(const GaussianFitter& other_)
-    {
-        return GaussianFitter(*this);
-    }
-
-    void init(){
-        SetMeanNames("means");
-        SetStdDevNames("stddevs");
-    }
-
-    void SetMeanNames(const std::string& baseName_);
-    void SetStdDevNames(const std::string& baseName_);
+    // GaussianFitter(Gaussian* gaus);
+    GaussianFitter(Gaussian* gaus,const size_t& nDims);
 
     void   SetParameter(const std::string& name_, double value);
     double GetParameter(const std::string& name_) const;
@@ -46,7 +26,7 @@ public:
 
 private:
     Gaussian* fOrignalFunc;
-    std::vector<std::string> fMeans;
-    std::vector<std::string> fStdDevs;
+    std::vector<std::string> fMeansNames;
+    std::vector<std::string> fStdDevsNames;
 };
 #endif
