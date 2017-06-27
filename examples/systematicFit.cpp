@@ -116,8 +116,8 @@ function(){
     gaus_a->RenameParameter("stddevs_0","gaus_a_2");
 
     conv_a->SetFunction(gaus_a);
-    conv_a->RenameParameter("means_0","gaus_a_1");
-    conv_a->RenameParameter("stddevs_0","gaus_a_2");
+    // conv_a->RenameParameter("means_0","gaus_a_1");
+    // conv_a->RenameParameter("stddevs_0","gaus_a_2");
 
     conv_a->SetAxes(axes);
     conv_a->SetTransformationObs(obsSet);
@@ -129,8 +129,8 @@ function(){
     gaus_b->RenameParameter("means_0","gaus_b_1");
     gaus_b->RenameParameter("stddevs_0","gaus_b_2");
     conv_b->SetFunction(gaus_b);
-    conv_b->RenameParameter("means_0","gaus_b_1");
-    conv_b->RenameParameter("stddevs_0","gaus_b_2");
+    // conv_b->RenameParameter("means_0","gaus_b_1");
+    // conv_b->RenameParameter("stddevs_0","gaus_b_2");
     conv_b->SetAxes(axes);
     conv_b->SetTransformationObs(obsSet);
     conv_b->SetDistributionObs(obsSet);

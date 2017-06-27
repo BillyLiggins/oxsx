@@ -17,7 +17,7 @@ class Gaussian : public PDF{
 
     Gaussian(const Gaussian& copy_);
 
-    Gaussian operator=(const Gaussian& other_);
+    Gaussian& operator=(const Gaussian& other_);
 
     virtual   Function* Clone() const;
 
@@ -32,8 +32,12 @@ class Gaussian : public PDF{
     // Getters/Setters
     double GetMean(size_t dimension_) const;
     double GetStDev(size_t dimension_) const;    
+
+    void SetMean(const size_t& dim_ , const double& value_);
+    void SetStDev(const size_t& dim_ , const double& value_);
+
     std::vector<double> GetMeans() const;
-    std::vector<double> GetStdDevs() const;
+    std::vector<double> GetStDevs() const;
     double GetCdfCutOff() const;
     void   SetCdfCutOff(double);
     int    GetNDims() const;
@@ -52,14 +56,9 @@ class Gaussian : public PDF{
     std::string GetName() const;
     void SetName(const std::string&);
     void SetMeans(const std::vector<double>& means_);
-    void SetStdDevs(const std::vector<double>& stddev_);
-     
-    void SetMean(const size_t& dim_ , const double& value_);
-    void SetStdDev(const size_t& dim_ , const double& value_);
-
-    size_t GetNMeans();
-    size_t GetNStdDevs();
+    void SetStDevs(const std::vector<double>& stddev_);
  private:
+    GaussianFitter fFitter;
     std::vector<double> fMeans;
     std::vector<double> fStdDevs;
     
@@ -75,6 +74,5 @@ class Gaussian : public PDF{
     // this is private, we want the dimensionality to be fixed at creation
     void SetMeansStdDevs(const std::vector<double>& means_, 
                          const std::vector<double>& stdDevs_);
-    GaussianFitter fFitter;
 };
 #endif

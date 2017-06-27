@@ -7,9 +7,11 @@
 #include <Exceptions.h>
 #include <algorithm>
 
+
+using ContainerTools::ToString;
+
 GaussianFitter::GaussianFitter(Gaussian* gaus, const size_t& nDims_){
     fOrignalFunc = gaus; 
-    size_t nMeans = gaus->GetNMeans();
     std::stringstream ss;
     for (int i = 0; i <nDims_; ++i) {
         ss << "means" << "_" << i;
@@ -21,6 +23,17 @@ GaussianFitter::GaussianFitter(Gaussian* gaus, const size_t& nDims_){
     }
 }
 
+GaussianFitter::GaussianFitter(Gaussian* gaus, const std::set<std::string>& parametersNames_){
+    fOrignalFunc = gaus; 
+    std::stringstream ss;
+    std::vector<std::string> nameHolder(parametersNames_.size());
+    std::copy(parametersNames_.begin(), parametersNames_.end(), nameHolder.begin()); 
+    for (int i = 0; i <nameHolder.size()/2; ++i)
+        fMeansNames.push_back(nameHolder.at(i));
+    for (int i = nameHolder.size()/2; i <nameHolder.size(); ++i)
+        fStdDevsNames.push_back(nameHolder.at(i));
+}
+
 void
 GaussianFitter::RenameParameter(const std::string& old_, const std::string& new_){
     std::vector<std::string>::iterator it;
@@ -29,8 +42,8 @@ GaussianFitter::RenameParameter(const std::string& old_, const std::string& new_
     if(it==fMeansNames.end()){
         it=find(fStdDevsNames.begin(),fStdDevsNames.end(), old_);
         if(it==fStdDevsNames.end())
-            throw NotFoundError(Formatter()<<"GaussianFitter:: When renaming the original name wasn't found : "<<
-                    old_);
+            throw NotFoundError(Formatter()<<"GaussianFitter:: When attempting to renaming the parameter "<< old_<<", it wasn't found. Available names: "<<
+                    ToString(GetParameterNames()) );
         *it=new_;
         return;
     }
@@ -48,10 +61,9 @@ GaussianFitter::SetParameter(const std::string& name_, double value_){
         it=find(fStdDevsNames.begin(),fStdDevsNames.end(), name_);
 
         if(it==fStdDevsNames.end())
-            //This should use compare keys.
             return;
 
-        fOrignalFunc->SetStdDev(it-fStdDevsNames.begin(),value_);
+        fOrignalFunc->SetStDev(it-fStdDevsNames.begin(),value_);
         return;
     }
     fOrignalFunc->SetMean(it-fMeansNames.begin(),value_);
@@ -59,8 +71,6 @@ GaussianFitter::SetParameter(const std::string& name_, double value_){
 
 double
 GaussianFitter::GetParameter(const std::string& name_) const{
-    std::vector<double> means = fOrignalFunc->GetMeans();
-    std::vector<double> stddevs= fOrignalFunc->GetStdDevs();
     std::vector<std::string>::const_iterator it;
 
     it=find(fMeansNames.begin(),fMeansNames.end(), name_);
@@ -71,11 +81,11 @@ GaussianFitter::GetParameter(const std::string& name_) const{
         if(it==fStdDevsNames.end())
             throw NotFoundError(Formatter()<<"GaussianFitter:: Parameter : "<<
                                 name_<<
-                                " was not known to the GaussianFitter.");
-
-        return stddevs.at(it-fStdDevsNames.end());
+                                " was not known to the GaussianFitter. Available names: "<<
+                                ToString(GetParameterNames()) );
+        return fOrignalFunc->GetStDev(it-fStdDevsNames.end());
     }
-    return means.at(it-fMeansNames.end());
+    return fOrignalFunc->GetMean(it-fStdDevsNames.end());
 }
 
 void
@@ -88,7 +98,7 @@ GaussianFitter::SetParameters(const ParameterDict& ps_){
 ParameterDict
 GaussianFitter::GetParameters() const{
     std::vector<double> means = fOrignalFunc->GetMeans();
-    std::vector<double> stddevs= fOrignalFunc->GetStdDevs();
+    std::vector<double> stddevs= fOrignalFunc->GetStDevs();
     std::vector<double> values;
 
     values.reserve( means.size() + stddevs.size() ); // preallocate memory
@@ -110,12 +120,13 @@ GaussianFitter::GetParameterCount() const{
 
 std::set<std::string>
 GaussianFitter::GetParameterNames() const{
+    //BL : The order of the returned set is required to be means+stddevs by
+    //the Gaussian copy constructor. 
     std::set<std::string> names;
-    for (int i = 0; i < fMeansNames.size(); ++i) {
+    for (int i = 0; i < fMeansNames.size(); ++i)
         names.insert(fMeansNames.at(i));
+    for (int i = 0; i < fStdDevsNames.size(); ++i) 
         names.insert(fStdDevsNames.at(i));
-    }
-
     return names;
 }
 

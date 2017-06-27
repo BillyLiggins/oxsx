@@ -2,6 +2,7 @@
 #include <GaussianFitter.h>
 #include <Exceptions.h>
 #include <ContainerParameter.h>
+#include <ContainerTools.hpp>
 #include <Formatter.hpp>
 #include <gsl/gsl_cdf.h>
 #include <Rand.h>
@@ -9,7 +10,6 @@
 #include <math.h>
 #include <ContainerTools.hpp>
 
-using ContainerTools::ToString;
 
 /////////////////////////
 // Constructory Things //
@@ -34,7 +34,7 @@ Gaussian::Gaussian(const std::vector<double>& mean_,
     Initialise(mean_, stdDev_, name_);
 }
 
-Gaussian::Gaussian(const Gaussian& copy_): fFitter(this,copy_.fNDims){
+Gaussian::Gaussian(const Gaussian& copy_): fFitter(this,copy_.GetParameterNames()){
     fMeans = copy_.fMeans;
     fStdDevs = copy_.fStdDevs;
     fCdfCutOff = copy_.fCdfCutOff;
@@ -42,14 +42,14 @@ Gaussian::Gaussian(const Gaussian& copy_): fFitter(this,copy_.fNDims){
     fName = std::string(copy_.fName+"_copy");
 }
 
-Gaussian
+Gaussian&
 Gaussian::operator=(const Gaussian& copy_){
     fMeans = copy_.fMeans;
     fStdDevs = copy_.fStdDevs;
     fCdfCutOff = copy_.fCdfCutOff;
     fNDims = copy_.fNDims;
     fName = std::string(copy_.fName+"_copy");
-    fFitter = GaussianFitter(this,fNDims);
+    fFitter = GaussianFitter(this,copy_.GetParameterNames());
     return *this;
 }
 
@@ -83,7 +83,7 @@ Gaussian::GetMean(size_t dimension_) const{
         return fMeans.at(dimension_);
     }
     catch(const std::out_of_range& e_){
-        throw NotFoundError("Requested Gaussian mean beyond function dimensionality!");
+        throw NotFoundError("Gaussian::Requested Gaussian mean beyond function dimensionality!");
     }
 }
 
@@ -93,7 +93,7 @@ Gaussian::GetStDev(size_t dimension_) const{
         return fStdDevs.at(dimension_);
     }
     catch(const std::out_of_range& e_){
-        throw NotFoundError("Requested Gaussian stdDev beyond function dimensionality!");
+        throw NotFoundError("Gaussian::Requested Gaussian stdDev beyond function dimensionality!");
     }
 }
 
@@ -103,7 +103,7 @@ Gaussian::SetMean(const size_t& dim_ , const double& value_) {
 }
 
 void
-Gaussian::SetStdDev(const size_t& dim_ , const double& value_) {
+Gaussian::SetStDev(const size_t& dim_ , const double& value_) {
     fStdDevs[dim_]= value_;
 }
 
@@ -113,7 +113,7 @@ Gaussian::SetMeans(const std::vector<double>& means_) {
 }
 
 void
-Gaussian::SetStdDevs(const std::vector<double>& stddevs_) {
+Gaussian::SetStDevs(const std::vector<double>& stddevs_) {
     fStdDevs = stddevs_;
 }
 
@@ -126,11 +126,11 @@ void
 Gaussian::SetMeansStdDevs(const std::vector<double>& means_, 
                           const std::vector<double>& stdDevs_){
     if (means_.size() != stdDevs_.size())
-        throw DimensionError("Tried to set Gaussian function with #means != #stdDevs!");
+        throw DimensionError("Gaussian::Tried to set Gaussian function with #means != #stdDevs!");
 
     for(size_t i = 0; i < stdDevs_.size(); i++)
         if(stdDevs_.at(i) <= 0)
-            throw ValueError("Gaussian standard deviation must be greater than 0!");
+            throw ValueError("Gaussian::Gaussian standard deviation must be greater than 0!");
 
     fMeans = means_;
     fStdDevs = stdDevs_;
@@ -138,7 +138,7 @@ Gaussian::SetMeansStdDevs(const std::vector<double>& means_,
 }
 
 std::vector<double>
-Gaussian::GetStdDevs() const {
+Gaussian::GetStDevs() const {
     return fStdDevs;
 }
 
@@ -164,7 +164,7 @@ Gaussian::GetNDims() const{
 double 
 Gaussian::operator() (const std::vector<double>& vals_) const{
     if (vals_.size() != GetNDims())
-        throw DimensionError("Gaussian dimensionality does not match the input vector to evaluate!");
+        throw DimensionError("Gaussian::Gaussian dimensionality does not match the input vector to evaluate!");
 
     double exponent = 0;
     double mean;
@@ -199,7 +199,7 @@ Gaussian::Cdf(size_t dim_, double val_) const{
 double 
 Gaussian::Integral(const std::vector<double>& mins_, const std::vector<double>& maxs_) const{
     if(mins_.size() != GetNDims() || maxs_.size() != GetNDims())
-        throw DimensionError("Gaussian, tried to integrate over interval of wrong dimensionality");
+        throw DimensionError("Gaussian::Gaussian, tried to integrate over interval of wrong dimensionality");
 
     double integral = 1;
     for(size_t i = 0; i < mins_.size(); i++)
@@ -266,12 +266,3 @@ Gaussian::SetName(const std::string& name_){
     fName = name_;
 }
 
-size_t
-Gaussian::GetNMeans(){
-    return fMeans.size();
-}
-
-size_t
-Gaussian::GetNStdDevs(){
-    return fStdDevs.size();
-}
