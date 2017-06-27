@@ -16,7 +16,7 @@ class Gaussian : public PDF{
 
     Gaussian(const Gaussian& copy_);
 
-    Gaussian operator=(const Gaussian& other_);
+    Gaussian& operator=(const Gaussian& other_);
 
     virtual   Function* Clone() const;
 
@@ -57,6 +57,7 @@ class Gaussian : public PDF{
     void SetMeans(const std::vector<double>& means_);
     void SetStDevs(const std::vector<double>& stddev_);
  private:
+    GaussianFitter fFitter;
     std::vector<double> fMeans;
     std::vector<double> fStdDevs;
     
@@ -72,6 +73,5 @@ class Gaussian : public PDF{
     // this is private, we want the dimensionality to be fixed at creation
     void SetMeansStdDevs(const std::vector<double>& means_, 
                          const std::vector<double>& stdDevs_);
-    GaussianFitter fFitter;
 };
 #endif
