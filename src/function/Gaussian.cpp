@@ -47,9 +47,7 @@ Gaussian::operator=(const Gaussian& copy_){
     fCdfCutOff = copy_.fCdfCutOff;
     fNDims = copy_.fNDims;
     fName = std::string(copy_.fName+"_copy");
-    std::cout <<"Inside operator = "<< ContainerTools::ToString(copy_.GetParameterNames()) << std::endl;
     fFitter = GaussianFitter(this,copy_.GetParameterNames());
-    // fFitter = GaussianFitter(this,fNDims);
     return *this;
 }
 
