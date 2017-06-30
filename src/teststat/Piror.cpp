@@ -1,6 +1,7 @@
 #include <Piror.h>
 #include <iostream>
 #include <Exceptions.h>
+#include <algorithm>
 
 Piror::Piror(const Piror& other_){
     //What do you need to copy over?
@@ -8,12 +9,11 @@ Piror::Piror(const Piror& other_){
     function = dynamic_cast<Function*>(other_.function->Clone());
 }
 
-Piror Piror::operator=(const Piror& other_)
+Piror& Piror::operator=(const Piror& other_)
     {
-        // Piror* newPiror = new Piror(*this);
-        // return *newPiror;
-        // This line returns the a Piror which is copied from "this" using the copy operator.
-        return Piror(*this);
+        parameterList= other_.parameterList;
+        function = dynamic_cast<Function*>(other_.function->Clone());
+        return *this;
     }
 
 Piror::~Piror(){
@@ -41,13 +41,16 @@ Piror::GetFunction(){
 }
 
 double
-Piror::Probability(std::vector<double> parameters){
-
+Piror::Probability(const ParameterDict& param_){
+    std::vector<double> parameters;
+    for (std::vector<std::string>::const_iterator para_ = parameterList.begin(); para_ != parameterList.end(); ++para_) {
+        std::vector<std::string>::iterator it;
+        it = find(parameterList.begin(),parameterList.end(),*para_);
+        if(it!=parameterList.end())
+            // parameters.push_back(*para_);
+            parameters.push_back(param_.at(*it));
+    }
     if (parameters.size()!=parameterList.size())
-        throw std::runtime_error("Number of parameters provided not equal to the number expected.");
-    // if (!independent.empty())
-    //     throw std::runtime_error("Independent parameter not set.");
-
+        throw std::runtime_error("Piror:: Number of parameters provided not equal to the number expected.");
     return (*function)(parameters);
-
 }

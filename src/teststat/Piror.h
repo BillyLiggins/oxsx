@@ -5,26 +5,25 @@
 #include <stddef.h>
 #include <Function.h>
 #include <Gaussian.h>
+#include <ParameterDict.h>
 
 
 class Piror{
     public:
         Piror(){;}
         ~Piror();
-        Piror operator=(const Piror&);
+        Piror(const Piror&);
+        Piror& operator=(const Piror&);
         Piror(std::vector<std::string> parameters, Function* func):
             parameterList(parameters), function(func){;}
 
-        //Copy operator
-        Piror(const Piror&);
-        //Need to make a assignment copy.
 
         void SetParameterList(std::vector<std::string> dependences);
         std::vector<std::string> GetParameterList();
         void SetFunction(Function* func);
         Function* GetFunction();
 
-        double Probability(std::vector<double> parameters);
+        double Probability(const ParameterDict&);
 
     private:
         std::vector<std::string> parameterList;
