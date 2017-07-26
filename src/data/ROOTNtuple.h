@@ -1,5 +1,5 @@
 /****************************************************************************************/
-/* Hands out data from a simple root ntuple into an EventData object for each EventData */
+/* Hands out data from a simple root ntuple into an Event object for each Event */
 /* reads directly to save the copy (though this happens only once anyway)               */
 /****************************************************************************************/
 
@@ -10,14 +10,14 @@
 #include <TFile.h>
 #include <vector>
 
-class EventData;
+class Event;
 class TNtuple;
 class ROOTNtuple : public DataSet{
  public:
     ROOTNtuple(const std::string& fileName_, const std::string& treeName_);
     ~ROOTNtuple();
 
-    EventData GetEntry(size_t iEvent_) const;
+    Event GetEntry(size_t iEvent_) const;
     unsigned  GetNEntries() const;
     unsigned  GetNObservables() const;
     std::vector<std::string> GetObservableNames() const;
@@ -32,6 +32,6 @@ class ROOTNtuple : public DataSet{
     TFile*   fROOTFile;
     TNtuple* fNtuple;
     
-    EventData Assemble(size_t iEvent_) const;
+    Event Assemble(size_t iEvent_) const;
 };
 #endif

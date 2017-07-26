@@ -3,6 +3,7 @@
 #include <Optimiser.h>
 #include <FitResult.h>
 #include <Histogram.h>
+#include <set>
 
 class TestStatistic;
 class MetropolisHastings : public Optimiser{
@@ -10,7 +11,8 @@ class MetropolisHastings : public Optimiser{
      MetropolisHastings() : fBurnIn(3000), 
                             fMaxIter(100000), fThinFactor(1), 
                             fMaxVal(0), fFlipSign(false), 
-                            fTestStatLogged(false), pTestStatistic(NULL)
+                            fTestStatLogged(false), pTestStatistic(NULL),
+                            fSaveFullHistogram(false)
                             {}               
     
     const FitResult& Optimise(TestStatistic*); 
@@ -26,14 +28,14 @@ class MetropolisHastings : public Optimiser{
 
     double   GetRejectionRate() const;
 
-    std::vector<double> GetMaxima() const;
-    void SetMaxima(const std::vector<double>&);
+    ParameterDict GetMaxima() const;
+    void SetMaxima(const ParameterDict&);
 
-    std::vector<double> GetMinima() const;
-    void SetMinima(const std::vector<double>&);
+    ParameterDict GetMinima() const;
+    void SetMinima(const ParameterDict&);
 
-    const std::vector<double>& GetSigmas() const;
-    void   SetSigmas(const std::vector<double>&);
+    const ParameterDict& GetSigmas() const;
+    void   SetSigmas(const ParameterDict&);
 
     bool GetFlipSign() const;
     void SetFlipSign(bool);
@@ -41,41 +43,58 @@ class MetropolisHastings : public Optimiser{
     bool GetTestStatLogged() const;
     void SetTestStatLogged(bool b_);
 
-    void SetInitialTrial(const std::vector<double>&);
-    std::vector<double> GetInitialTrial() const;
+    bool GetSaveFullHistogram() const;
+    void SetSaveFullHistogram(bool);
+    void SetHistogramAxes(const AxisCollection&);
+    AxisCollection GetHistogramAxes() const;
+
+    void SetInitialTrial(const ParameterDict&);
+    ParameterDict GetInitialTrial() const;
 
  private:
-    unsigned fBurnIn;
-    unsigned fThinFactor;
-    unsigned fMaxIter;
-    unsigned fNDims;
-    bool     fTestStatLogged;
-    
+    // configuration
+    unsigned  fBurnIn;
+    unsigned  fThinFactor;
+    unsigned  fMaxIter;
+    unsigned  fNDims;
+    bool      fTestStatLogged;
+    bool      fFlipSign;
+    bool      fSaveFullHistogram;
+    AxisCollection fHistogramAxes;
+
+    ParameterDict fMaxima;
+    ParameterDict fMinima;
+    ParameterDict fSigmas;
+    ParameterDict fInitialTrial;
+
+    // internal copy
     TestStatistic* pTestStatistic;
-    std::vector<double> fMaxima;
-    std::vector<double> fMinima;
-    std::vector<double> fSigmas;
-    std::vector<double> fInitialTrial;
 
-    bool fFlipSign;
-
+    // results
     double fRejectionRate;
 
-    std::vector< std::vector<double> > fSample;
+    std::vector<Histogram>           f1DProjections;
+    std::vector<Histogram>           f2DProjections;
+    std::set<std::pair<std::string, std::string> > f2DProjNames;
+
     Histogram fHist;
+    std::vector< std::vector<double> > fSample;
+
     FitResult fFitResult;
-    std::vector<double> fBestFit;
+    ParameterDict fBestFit;
+    ParameterDict fSetParameters;
     double fMaxVal;
     
-    std::vector<double> JumpDraw(const std::vector<double>& thisStep_) const; 
-    inline double JumpProbRatio(const std::vector<double>& thisStep_, 
-                                const std::vector<double>& proposedStep_) const {return 1;}
+    // private functions
+    ParameterDict JumpDraw(const ParameterDict& thisStep_) const; 
+    inline double JumpProbRatio(const ParameterDict& thisStep_, 
+                                const ParameterDict& proposedStep_) const {return 1;}
 
-    bool   StepAccepted(const std::vector<double>& thisStep_,
-                        const std::vector<double>& proposedStep_);
+    bool   StepAccepted(const ParameterDict& thisStep_,
+                        const ParameterDict& proposedStep_);
     
-
-
+    void    InitialiseHistograms();
+    void    FillProjections(const ParameterDict&);
+    void    SaveProjections();
 };
 #endif
-

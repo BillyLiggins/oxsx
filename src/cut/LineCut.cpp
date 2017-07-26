@@ -1,5 +1,5 @@
 #include <LineCut.h>
-#include <EventData.h>
+#include <Event.h>
 #include <Exceptions.h>
 
 LineCut::LineCut(size_t dim_, double val_, 
@@ -14,7 +14,7 @@ LineCut::Clone() const{
 }
 
 bool 
-LineCut::PassesCut(const EventData& ev_) const{
+LineCut::PassesCut(const Event& ev_) const{
     double val = 0;
     try{
         val = ev_.GetDatum(fDim);

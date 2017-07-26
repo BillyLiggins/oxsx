@@ -1,8 +1,9 @@
 #include <ROOTNtuple.h>
-#include <EventData.h>
+#include <Event.h>
 #include <iostream>
 #include <Exceptions.h>
 #include <TNtuple.h>
+#include <Formatter.hpp>
 
 ROOTNtuple::ROOTNtuple(const std::string& fileName_, const std::string& treeName_){
     fROOTFile = new TFile(fileName_.c_str());
@@ -16,7 +17,7 @@ ROOTNtuple::ROOTNtuple(const std::string& fileName_, const std::string& treeName
 
     if(!fNtuple){
         delete fROOTFile;
-        throw IOError("ROOTNtuple::Tree does not exist, or isn't an ntuple! " + treeName_);
+        throw IOError(Formatter()<<"ROOTNtuple::Tree does not exist, or isn't an ntuple! tree : " << treeName_ << ", filename: "<<fileName_);
     }        
 
 }
@@ -27,18 +28,18 @@ ROOTNtuple::~ROOTNtuple(){
     delete fROOTFile;
 }
 
-EventData 
+Event 
 ROOTNtuple::Assemble(size_t iEvent_) const{
     if (iEvent_ >= GetNEntries())
         throw NotFoundError("Exceeded end of ROOT NTuple");
 
     fNtuple -> GetEntry(iEvent_);
     float* vals = fNtuple -> GetArgs();
-    return EventData(std::vector<double> (vals, vals + GetNObservables()));
+    return Event(std::vector<double> (vals, vals + GetNObservables()));
     
 }
 
-EventData
+Event
 ROOTNtuple::GetEntry(size_t iEvent_) const{
     if(iEvent_ >= GetNEntries())
         throw NotFoundError("Exceeded end of ROOT NTuple");

@@ -10,36 +10,39 @@
 
 #ifndef __OXSX_SYSTEMATIC__
 #define __OXSX_SYSTEMATIC__
-#include <PdfMapping.h>
-#include <BinnedPdf.h>
+#include <SparseMatrix.h>
+#include <BinnedED.h>
 #include <FitComponent.h>
-#include <DataRepresentation.h>
+#include <ObsSet.h>
 #include <vector>
 
 class Systematic : public FitComponent{
  public:
     virtual ~Systematic()  {}
 
-    BinnedPdf 
-    operator()(const BinnedPdf& pdf_) const;
+    BinnedED 
+    operator()(const BinnedED& pdf_) const;
         
-    void 
-    SetResponse(const PdfMapping& responseMatrix_);
-    const PdfMapping& GetResponse() const;
+    void SetResponse(const SparseMatrix& responseMatrix_);
+    const SparseMatrix& GetResponse() const;
         
-    void SetDataRep(const DataRepresentation&);
-    DataRepresentation GetDataRep() const;
+    void   SetTransformationObs(const ObsSet&);
+    ObsSet GetTransformationObs() const;
 
-    void SetPdfDataRep(const DataRepresentation&);
-    DataRepresentation GetPdfDataRep() const;
+    void   SetDistributionObs(const ObsSet&);
+    ObsSet GetDistributionObs() const;
+
+    const AxisCollection& GetAxes() const;
+    void  SetAxes(const AxisCollection& axes_);
 
     virtual void Construct() = 0;
 
  protected:
-    PdfMapping         fPdfMapping;
-    DataRepresentation fDataRep;     // the data indicies that this systematic acts on
-    DataRepresentation fPdfDataRep;  
-    // the data indices  of the pdfs it will act on, needs to be at least the lenth of the 
+    SparseMatrix   fResponse;
+    AxisCollection fAxes; // The full bin definition of the distributions
+    ObsSet fTransObs;     // the observables to tranform
+    ObsSet fDistObs;      // the full set of observables for the distriubtion to act on
+    // obs of the pdfs it will act on, needs to be at least the lenth of the 
     // systematics representation
     
     // methods below used for index manipilation between pdf and response

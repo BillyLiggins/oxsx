@@ -1,12 +1,13 @@
 #ifndef __BinnedNLLH__
 #define __BinnedNLLH__
 #include <TestStatistic.h>
-#include <BinnedPdfManager.h>
+#include <BinnedEDManager.h>
 #include <SystematicManager.h>
-#include <BinnedPdfShrinker.h>
+#include <BinnedEDShrinker.h>
 #include <ComponentManager.h>
 #include <DataSet.h>
 #include <CutCollection.h>
+#include <CutLog.h>
 #include <QuadraticConstraint.h>
 #include <map>
 #include <vector>
@@ -14,15 +15,15 @@
 class DataSet;
 class BinnedNLLH : public TestStatistic{
  public:
-    BinnedNLLH() : fCalculatedDataPdf(false), fDataSet(NULL) {}
+    BinnedNLLH() : fCalculatedDataDist(false), fAlreadyShrunk(false), fDataSet(NULL), fSignalCutEfficiency(1){}
 
-    void   SetPdfManager(const BinnedPdfManager&);
+    void   SetPdfManager(const BinnedEDManager&);
     void   SetSystematicManager(const SystematicManager&);
 
-    void   AddPdf(const BinnedPdf&);
+    void   AddPdf(const BinnedED&);
     void   AddSystematic(Systematic*);
 
-    void   AddPdfs(const std::vector<BinnedPdf>&);
+    void   AddPdfs(const std::vector<BinnedED>&);
     void   AddSystematics(const std::vector<Systematic*>);
 
     void   SetConstraint(const std::string& paramName_, double mean_, double sigma_);
@@ -32,8 +33,8 @@ class BinnedNLLH : public TestStatistic{
 
     void  BinData();
 
-    void SetDataPdf(const BinnedPdf&);
-    BinnedPdf GetDataPdf() const;
+    void SetDataDist(const BinnedED&);
+    BinnedED GetDataDist() const;
 
     void SetDataSet(DataSet*);
     DataSet* GetDataSet();
@@ -46,24 +47,34 @@ class BinnedNLLH : public TestStatistic{
     void AddCut(const Cut&);
     void SetCuts(const CutCollection&);
 
+    double GetSignalCutEfficiency() const;
+    void   SetSignalCutEfficiency(double);
+
+    CutLog GetSignalCutLog() const;
+    void   SetSignalCutLog(const CutLog&);
+
     // Test statistic interface
     void RegisterFitComponents(); 
-    void SetParameters(const std::vector<double>&);
-    std::vector<double> GetParameters() const;
+    void SetParameters(const ParameterDict&);
+    ParameterDict GetParameters() const;
     int  GetParameterCount() const;
+    std::set<std::string> GetParameterNames() const;
     double Evaluate();
-    std::vector<std::string> GetParameterNames() const;
 
  private:
-    BinnedPdfManager  fPdfManager;
-    SystematicManager fSystematicManager;
-    BinnedPdfShrinker fPdfShrinker;
-    DataSet* fDataSet;
-    CutCollection fCuts;
+    BinnedEDManager      fPdfManager;
+    SystematicManager    fSystematicManager;
+    BinnedEDShrinker     fPdfShrinker;
+    DataSet*             fDataSet;
+    CutCollection        fCuts;
     std::map<std::string, QuadraticConstraint> fConstraints;
 
-    BinnedPdf fDataPdf;
-    bool      fCalculatedDataPdf;
+    double  fSignalCutEfficiency;
+    CutLog  fSignalCutLog;
+
+    BinnedED         fDataDist;
+    bool             fCalculatedDataDist;
+    bool             fAlreadyShrunk;
     ComponentManager fComponentManager;    
 };
 #endif

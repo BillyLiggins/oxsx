@@ -1,6 +1,6 @@
 #ifndef __OXSX_BOX_CUT__
 #define __OXSX_BOX_CUT__
-#include <EventData.h>
+#include <Event.h>
 #include <Cut.h>
 
 class BoxCut : public Cut{
@@ -8,10 +8,9 @@ class BoxCut : public Cut{
     BoxCut(size_t dim_, double lower_, double upper_) : fDim(dim_), fUpperLim(upper_), 
                                                         fLowerLim(lower_) {}
 
-    virtual ~BoxCut(){}
     virtual Cut* Clone() const;
 
-    virtual bool PassesCut(const EventData& ev_) const;
+    virtual bool PassesCut(const Event& ev_) const;
     
     void    SetLowerLimit(double lower_) {fLowerLim = lower_;} 
     double  GetLowerLimit() const {return fLowerLim;}

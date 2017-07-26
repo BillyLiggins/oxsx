@@ -2,7 +2,7 @@
 #include <Exceptions.h>
 
 bool
-BoxCut::PassesCut(const EventData& ev_) const{
+BoxCut::PassesCut(const Event& ev_) const{
     double val = 0;
     try{
         val = ev_.GetDatum(fDim);
