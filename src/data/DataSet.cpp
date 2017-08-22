@@ -1,12 +1,12 @@
 #include <DataSet.h>
-#include <DataRepresentation.h>
+#include <ObsSet.h>
 #include <Exceptions.h>
 #include <string>
 #include <vector>
 #include <algorithm>
 typedef std::vector<std::string> StringVec;
 
-DataRepresentation 
+ObsSet 
 DataSet::MakeDataRep(const StringVec observableNames_) const{
     std::vector<size_t> indicies;
     indicies.reserve(observableNames_.size());
@@ -22,7 +22,7 @@ DataSet::MakeDataRep(const StringVec observableNames_) const{
         else
             indicies.push_back(pos - availableNames.begin());
     }
-    return DataRepresentation(indicies);
+    return ObsSet(indicies);
 }
 
 

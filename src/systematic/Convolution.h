@@ -10,34 +10,42 @@
 #define __OXSX_CONVOLUTION__
 #include <Systematic.h>
 
-class IntegrableFunction;
+class ConditionalPDF;
+class PDF;
 class Convolution : public Systematic{
  public:
-    Convolution(): fFunction(NULL), fHasAxes(false), fCachedCompatibleBins(false) {}
+    Convolution(const std::string& name_): fDist(NULL), fCachedCompatibleBins(false), fName(name_) {}
     ~Convolution();
-    void SetFunction(IntegrableFunction* function_);
-    void SetAxes(const AxisCollection& axes_);
+    void SetFunction(PDF* function_);
+    void SetConditionalPDF(ConditionalPDF* function_);
     void Construct();    
 
-    // Make this fittable, by delegating to the underlying function
-    void MakeFittable();
-    std::vector<std::string> GetParameterNames() const;
-    std::vector<double>      GetParameters() const;
-    size_t                   GetParameterCount() const;
-    void                     SetParameters(const std::vector<double>&);
+    // Make this fittable, by delegating to the underlying pdf
+    void   SetParameter(const std::string& name_, double value);
+    double GetParameter(const std::string& name_) const;
+
+    void   SetParameters(const ParameterDict&);
+    ParameterDict GetParameters() const;
+    size_t GetParameterCount() const;
+
+    std::set<std::string> GetParameterNames() const;
+    void   RenameParameter(const std::string& old_, const std::string& new_);
+
+    std::string GetName() const;
+    void SetName(const std::string&);
 
  private:
     void                     Reset();
-    IntegrableFunction*      fFunction;
-    bool                     fHasAxes;
+    ConditionalPDF*          fDist;
     bool                     fCachedCompatibleBins;
 
-    AxisCollection fSysAxes;
+    AxisCollection  fSubMapAxes;
     void  CacheCompatibleBins();
     std::vector<std::vector<size_t> > fCompatibleBins;
     // the systematic subMap bin for each global bin of pdf
     std::vector<size_t> fSysBins; 
+
+    std::string fName;
     
 };
 #endif
-

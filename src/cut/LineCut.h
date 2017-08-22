@@ -14,7 +14,7 @@ class LineCut : public Cut{
     virtual ~LineCut(){}
     virtual Cut* Clone() const;
 
-    virtual bool PassesCut(const EventData& ev_) const;
+    virtual bool PassesCut(const Event& ev_) const;
     
     void   SetCutValue(double);
     double GetCutValue() const;

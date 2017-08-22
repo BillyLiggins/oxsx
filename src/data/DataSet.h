@@ -7,18 +7,18 @@
 #include <vector>
 #include <string>
 
-class DataRepresentation;
-class EventData;
+class ObsSet;
+class Event;
 class DataSet{
  public:
-    virtual EventData GetEntry(size_t iEvent_) const = 0;
+    virtual Event GetEntry(size_t iEvent_) const = 0;
     virtual ~DataSet() {}
 
     virtual unsigned GetNEntries() const = 0; 
     virtual unsigned GetNObservables() const = 0; 
 
     virtual std::vector<std::string> GetObservableNames() const = 0;
-    DataRepresentation MakeDataRep(const std::vector<std::string> observableNames_) const;
+    ObsSet MakeDataRep(const std::vector<std::string> observableNames_) const;
 
 };
 #endif

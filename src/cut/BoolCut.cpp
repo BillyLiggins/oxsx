@@ -1,9 +1,9 @@
 #include <BoolCut.h>
 #include <Exceptions.h>
-#include <EventData.h>
+#include <Event.h>
 
 bool
-BoolCut::PassesCut(const EventData& ev_) const{
+BoolCut::PassesCut(const Event& ev_) const{
   double val = 0;
   try{
     val = ev_.GetDatum(fDim);

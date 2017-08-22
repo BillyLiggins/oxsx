@@ -12,28 +12,37 @@
 
 class OXSXDataSet;
 class DataSet;
-class EventData;
+class Event;
 
 class DataSetGenerator{
  public:
-    DataSetGenerator() {}
-    ~DataSetGenerator() {}
+    DataSetGenerator() : fBootstrap(false){}
     void SetDataSets(const std::vector<DataSet*> sets_);
     void SetExpectedRates(const std::vector<double>& rates_);
     void AddDataSet(DataSet* data_, double rates_);
     
     void SetCuts(const CutCollection& cuts_);
+    void AddCut(const Cut& cut_);
 
-    OXSXDataSet ExpectedRatesDataSet() const;
-    OXSXDataSet PoissonFluctuatedDataSet() const; // needs implementing
-    OXSXDataSet AllValidEvents() const; // needs implementing
+    bool GetBootstrap() const;
+    void SetBootstrap(bool);
+
+    OXSXDataSet ExpectedRatesDataSet();
+    OXSXDataSet PoissonFluctuatedDataSet(); 
+    OXSXDataSet AllValidEvents();
     
+    std::vector<OXSXDataSet*> AllRemainingEvents();
+    void ClearDataSets();
+    void Reset();
  private:
     std::vector<DataSet*>    fDataSets;
     std::vector<double>      fExpectedRates;
+    std::vector<std::vector<size_t> > fEventIndicies;
+    std::vector<size_t>      fMaxs;
+    void                     RandomDrawsNoReplacement(size_t handleIndex_, int nEvents_, OXSXDataSet& data_);
+    void                     RandomDrawsWithReplacement(size_t handleIndex_, int nEvents_, OXSXDataSet& data_);
+    bool                     fBootstrap;
     CutCollection            fCuts;
-    EventData                RandomEvent(size_t handleIndex_) const;
-
 };
 
 #endif

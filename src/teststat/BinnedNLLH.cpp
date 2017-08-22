@@ -2,17 +2,23 @@
 #include <math.h>
 #include <DataSet.h>
 #include <Exceptions.h>
-#include <PdfFiller.h>
+#include <DistFiller.h>
+#include <CutLog.h>
 #include <iostream>
 
 double 
 BinnedNLLH::Evaluate(){
-    if(!fDataSet && !fCalculatedDataPdf) 
-        throw LogicError("BinnedNNLH function called with no data set and no DataPdf! set one of these first");
+    if(!fDataSet && !fCalculatedDataDist) 
+        throw LogicError("BinnedNNLH function called with no data set and no DataDist! set one of these first");
     
-    if (!fCalculatedDataPdf)
+    if (!fCalculatedDataDist)
         BinData();
     
+    if(!fAlreadyShrunk){
+        fDataDist = fPdfShrinker.ShrinkDist(fDataDist);
+        fAlreadyShrunk = true;
+    }
+
     // Construct systematics
     fSystematicManager.Construct();
 
@@ -24,11 +30,11 @@ BinnedNLLH::Evaluate(){
 
     // loop over bins and calculate the likelihood
     double nLogLH = 0;
-    for(size_t i = 0; i < fDataPdf.GetNBins(); i++){
-        double prob = fPdfManager.BinProbability(i);	
+    for(size_t i = 0; i < fDataDist.GetNBins(); i++){
+        double prob = fPdfManager.BinProbability(i);
         if(!prob)
             throw std::runtime_error("BinnedNLLH::Encountered zero probability bin!");
-        nLogLH -= fDataPdf.GetBinContent(i) *  log(prob);        
+        nLogLH -= fDataDist.GetBinContent(i) *  log(prob);        
     }
 
 
@@ -47,15 +53,16 @@ BinnedNLLH::Evaluate(){
 
 void
 BinnedNLLH::BinData(){
-    BinnedPdf dataPdf(fPdfManager.GetOriginalPdf(0)); // make a copy for same binning and data rep
-    dataPdf.Empty();
-    PdfFiller::FillPdf(dataPdf, *fDataSet, fCuts);
-    fDataPdf = fPdfShrinker.ShrinkPdf(dataPdf);
-    fCalculatedDataPdf = true;
+    fDataDist =  BinnedED(fPdfManager.GetOriginalPdf(0)); // make a copy for same binning and data rep
+    fDataDist.Empty();
+    CutLog log(fCuts.GetCutNames());
+    DistFiller::FillDist(fDataDist, *fDataSet, fCuts, log);
+    fCalculatedDataDist = true;    
+    fSignalCutLog = log;
 }
 
 void
-BinnedNLLH::SetPdfManager(const BinnedPdfManager& man_){
+BinnedNLLH::SetPdfManager(const BinnedEDManager& man_){
     fPdfManager = man_;
 }
 
@@ -65,7 +72,7 @@ BinnedNLLH::SetSystematicManager(const SystematicManager& man_){
 }
 
 void
-BinnedNLLH::AddPdf(const BinnedPdf& pdf_){
+BinnedNLLH::AddPdf(const BinnedED& pdf_){
     fPdfManager.AddPdf(pdf_);
 }
 
@@ -77,7 +84,7 @@ BinnedNLLH::AddSystematic(Systematic* sys_){
 void
 BinnedNLLH::SetDataSet(DataSet* dataSet_){
     fDataSet = dataSet_;
-    fCalculatedDataPdf = false;
+    fCalculatedDataDist = false;
 }
 
 DataSet*
@@ -86,14 +93,14 @@ BinnedNLLH::GetDataSet(){
 }
 
 void
-BinnedNLLH::SetDataPdf(const BinnedPdf& binnedPdf_){
-  fDataPdf = fPdfShrinker.ShrinkPdf(binnedPdf_);
-  fCalculatedDataPdf = true;
+BinnedNLLH::SetDataDist(const BinnedED& binnedPdf_){
+    fDataDist = binnedPdf_;
+    fCalculatedDataDist = true;
 }
 
-BinnedPdf
-BinnedNLLH::GetDataPdf() const{
-    return fDataPdf;
+BinnedED
+BinnedNLLH::GetDataDist() const{
+    return fDataDist;
 }
 
 
@@ -118,7 +125,7 @@ BinnedNLLH::GetBufferAsOverflow() const{
 }
 
 void
-BinnedNLLH::AddPdfs(const std::vector<BinnedPdf>& pdfs_){
+BinnedNLLH::AddPdfs(const std::vector<BinnedED>& pdfs_){
   for(size_t i = 0; i < pdfs_.size(); i++)
     AddPdf(pdfs_.at(i));
 }
@@ -155,6 +162,27 @@ BinnedNLLH::SetConstraint(const std::string& paramName_, double mean_, double si
     fConstraints[paramName_] = QuadraticConstraint(mean_, sigma_);
 }
 
+
+double
+BinnedNLLH::GetSignalCutEfficiency() const{
+    return fSignalCutEfficiency;
+}
+
+void
+BinnedNLLH::SetSignalCutEfficiency(double eff_){
+    fSignalCutEfficiency = eff_;
+}
+
+CutLog
+BinnedNLLH::GetSignalCutLog() const{
+    return fSignalCutLog;
+}
+
+void
+BinnedNLLH::SetSignalCutLog(const CutLog& lg_){
+    fSignalCutLog = lg_;
+}
+
 /////////////////////////////////////////////////////////
 // Declare which objects should be adjusted by the fit //
 /////////////////////////////////////////////////////////
@@ -167,17 +195,17 @@ BinnedNLLH::RegisterFitComponents(){
 }
 
 void
-BinnedNLLH::SetParameters(const std::vector<double>& params_){
+BinnedNLLH::SetParameters(const ParameterDict& params_){
     try{
         fComponentManager.SetParameters(params_);
     }
-    catch(const ParameterCountError& e_){
-        throw ParameterCountError(std::string("BinnedNLLH::") + e_.what());
+    catch(const ParameterError& e_){
+        throw ParameterError(std::string("BinnedNLLH::") + e_.what());
     }
 }
                                              
                  
-std::vector<double>
+ParameterDict
 BinnedNLLH::GetParameters() const{
     return fComponentManager.GetParameters();
 }
@@ -187,7 +215,7 @@ BinnedNLLH::GetParameterCount() const{
     return fComponentManager.GetTotalParameterCount();
 }
 
-std::vector<std::string>
+std::set<std::string>
 BinnedNLLH::GetParameterNames() const{
     return fComponentManager.GetParameterNames();
 }

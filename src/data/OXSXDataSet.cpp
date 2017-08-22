@@ -1,9 +1,9 @@
 #include <OXSXDataSet.h>
-#include <EventData.h>
+#include <Event.h>
 #include <Exceptions.h>
 #include <iostream>
 void
-OXSXDataSet::AddEntry(const EventData& evData_){
+OXSXDataSet::AddEntry(const Event& evData_){
     // fNObservables is zero at initialisation, after the first time it is set it shouldnt change
     if(!fNObservables)
         fNObservables = evData_.GetNObservables();
@@ -16,13 +16,13 @@ OXSXDataSet::AddEntry(const EventData& evData_){
     if(!evData_.GetNObservables())
         throw DimensionError("OXSXDataSet::Tried to add empty event to data set!");
 
-    fData -> push_back(evData_);
+    fData.push_back(evData_);
 }
 
-EventData
+Event
 OXSXDataSet::GetEntry(size_t eventIndex_) const{
     try{
-    return fData -> at(eventIndex_);
+    return fData.at(eventIndex_);
     }
     catch(std::out_of_range&){
         throw NotFoundError("");
@@ -31,21 +31,7 @@ OXSXDataSet::GetEntry(size_t eventIndex_) const{
 
 unsigned
 OXSXDataSet::GetNEntries() const{
-    return fData -> size();
-}
-
-OXSXDataSet::~OXSXDataSet(){
-    delete fData;
-}
-
-OXSXDataSet::OXSXDataSet(const OXSXDataSet& other_){
-    fData = new std::vector<EventData>(*other_.fData);
-}
-
-OXSXDataSet
-OXSXDataSet::operator=(const OXSXDataSet& other_){
-    fData = new std::vector<EventData>(*other_.fData);
-    return *this;
+    return fData.size();
 }
 
 void
@@ -69,7 +55,7 @@ OXSXDataSet::operator+ (const OXSXDataSet& other_){
 
 void
 OXSXDataSet::Reserve(int i){
-  fData->reserve(i);
+  fData.reserve(i);
 }
 
 unsigned
