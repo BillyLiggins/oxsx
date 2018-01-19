@@ -4,7 +4,7 @@
 #include <Exceptions.h>
 #include <DistFiller.h>
 #include <CutLog.h>
-#include <Piror.h>
+#include <Prior.h>
 #include <iostream>
 
 double 
@@ -49,26 +49,8 @@ BinnedNLLH::Evaluate(){
         it != fConstraints.end(); ++it)
         nLogLH += it->second.Evaluate(fComponentManager.GetParameter(it->first));
 
-    //Pirors
-    if(fPirorsSet) {
-        std::vector<Piror> pirors=fPirorManager.GetPirors();
-
-        std::cout <<  "pirors.size() = "<<pirors.size()<< std::endl;
-        for (int i = 0; i < pirors.size(); ++i) {
-            std::cout << "in" << std::endl;
-            std::vector<std::string> names = pirors.at(i).GetParameterList();
-            for (int j = 0; j < names.size(); ++j) {
-                std::cout << "inin" << std::endl;
-                std::cout <<"name"<<j<<" = "<< names.at(j)<< std::endl;
-            }
-
-        }
-        std::cout << "before adding = "<<nLogLH << std::endl;
-        nLogLH += fPirorManager.GetLogProbabilities(fComponentManager.GetParameters());
-        std::cout << "value = "<<fPirorManager.GetLogProbabilities(fComponentManager.GetParameters()) << std::endl;
-        std::cout << "after adding = "<<nLogLH << std::endl;
-
-    }
+    // The logged probabilty will be negative, therefore we take it away from the nLogLH.
+    nLogLH -= fPriorManager.GetLogProbabilities(fComponentManager.GetParameters());
 
     return nLogLH;
 }
